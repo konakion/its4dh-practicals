@@ -1,0 +1,26 @@
+site_name: Principles of IT Systems · Practical 01
+site_description: Terminal foundations for HPI Digital Health Master students
+strict: true
+theme:
+  name: material
+  palette:
+    primary: teal
+    accent: amber
+  features:
+    - navigation.footer
+    - content.code.copy
+plugins:
+  - search
+markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.superfences
+nav:
+  - Start here: index.md
+  - Environment: setup.md
+  - Practical 01: practical.md
+  - Challenges: challenges.md
+  - Solutions: solutions.md
+  - Command reference: reference.md
+  - Teaching notes and sources: teaching.md
