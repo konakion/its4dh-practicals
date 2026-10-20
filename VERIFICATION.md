@@ -1,11 +1,18 @@
-# Verification — 20 October 2026
+# Verification · 20 October 2026
 
-- PASS: `python3 scripts/check.py` executes the noninteractive Bash blocks from the practical in sequence in a disposable directory.
-- PASS: record/error/warning counts (20/6/3), storage error lines (6/10/15), device history, configuration differences, quoted filenames, saved report text and preservation of fixture bytes.
-- PASS: internal Markdown page links, devcontainer JSON parsing and referenced Dockerfile presence.
-- PASS: MkDocs 1.6.1 / Material 9.6.23 `mkdocs build --strict`, with no warnings.
-- Generated HTML is available in `site/`; source is in `docs/`.
+PASS locally on macOS with Bash and Python 3.12:
+- All noninteractive core Bash blocks from chapters 1–7 run sequentially in one temporary workspace.
+- Exercise copies/deletions, exact event counts, warning/error line numbers, device history, service/severity grouping and unchanged source fixture bytes.
+- Both normal and unified diff: expected exit status 1 for differences; semantic old/new values replace dependence on a normal-diff hunk header.
+- Optional noninteractive find, diff, script, chmod, aliases, client discovery and localhost HTTP/curl labs. Bash alias expansion is explicitly enabled in the noninteractive test shell; interactive Bash enables it by default.
+- mkdocs build --strict --clean, MkDocs 1.6.1 and Material 9.6.23.
+- Generated HTML: 13 pages; 420 local links, assets and fragment targets.
+- No solutions/ or teaching/ page, no private instructor files in student archive, no legacy solution entries in search index.
+- Source fixtures exactly match the supplied ZIP.
+- Browser spot check of narrow layout, chapter navigation and expansion of a staged hint.
 
-Commands were checked with Bash and local command-line utilities on macOS. Linux CI is included but has not been run remotely. The Docker daemon is unavailable in this environment, so the container image build and actual GitHub Codespaces creation remain untested. Interactive `less`, `man`, keyboard shortcuts and browser rendering need a classroom smoke test. No repository was published and no cloud environment was created.
+Not executed: Linux CI, container build (Docker daemon unavailable), a real Codespace, its stop/resume lifecycle, live Pages deployment, full interactive editor/viewer keyboard workflows or an actual SSH/SCP transfer. GNU grep --help is not executed on this macOS host because BSD grep differs; Linux CI executes it. The local uname result is Darwin; Linux is the expected result inside the intended container. Post-create checks test exercises in isolation, not the learner's own work.
 
-Before class: publish this directory as the repository root; create a fresh Codespace; confirm `uname` prints `Linux`; wait for automatic setup to pass; open the handbook on private port 8000; check `less` and `man grep`; stop the Codespace afterward.
+External links have been statically reviewed, not all verified live. GitHub API and main-branch archive requests returned 404; the public handbook fetch failed. Therefore live repository configuration, default branch, existing workflows and current deployment were not verified. GitHub billing and lifecycle guidance was checked against official GitHub Docs; account-specific allowances may change.
+
+See the private teaching guide for manual release acceptance. No GitHub push, external publication, Codespace creation or paid action was performed. site/ is a generated local preview only. Public handbook use does not require students to install MkDocs.

@@ -1,38 +1,41 @@
-# Practical 01 — Terminal foundations
+# Practical 01 · Linux investigation for Digital Health
 
-English, 90-minute handbook for Principles of IT Systems, HPI Digital Health Master.
-All wearable records are fabricated. No patient data or external services are used.
+A guided English 90-minute self-study practical, plus optional deep dives.
+The student path starts at docs/index.md. Student environments need only Python
+and standard Linux utilities; no MkDocs installation or preview server is required.
 
-## Start
+Public handbook (after release): https://konakion.github.io/its4dh-practicals/
+Own workspace: https://codespaces.new/konakion/its4dh-practicals
 
-Open [the setup guide](docs/setup.md), then [the practical](docs/practical.md).
-For a rendered handbook, from this directory run:
+## Maintainer validation
+From this repository's root:
 
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m mkdocs serve --dev-addr 0.0.0.0:8000
+.venv/bin/python scripts/check.py
+.venv/bin/python -m mkdocs build --strict --clean
+.venv/bin/python scripts/check_site.py
+.venv/bin/python -m mkdocs serve --dev-addr 127.0.0.1:8000
 ```
 
-In Codespaces open the forwarded port 8000. Keep its visibility private.
-Markdown pages can also be read directly without building.
+The last command is a local maintainer preview, not a student prerequisite.
+Stop it with Ctrl+C. On Windows, use the Dev Container, or the corresponding
+.venv/Scripts/python executable. Checks run in temporary copies; they never grade
+or reset student work/. Interactive acceptance and Codespaces must be checked too.
+Direct dependencies are pinned; the container base and transitive dependencies are
+not immutable locks. Review compatibility before a future course release.
 
-## Repository preparation (instructor)
+## Review and publication
+This folder is a proposed complete repository root. No GitHub push or deployment
+was performed. Follow the separate RELEASE-AND-VERIFICATION.md companion before
+copying into an existing checkout. Do not nest this folder inside the repository.
+Never copy the private instructor companion into a public repository: hidden
+navigation alone does not keep source private. Generated site/ is preview output
+and is ignored by Git; Actions regenerates it. No solution or teaching source is
+present under docs/.
 
-Publish **the contents of this directory as the repository root**, including hidden
-`.devcontainer/` and `.github/` directories. No GitHub repository has been created
-by this deliverable. On GitHub select Code → Codespaces → Create codespace on main.
-The first creation installs the environment; a rebuild requires internet access.
-No paid VPS or local Linux installation is needed. Check your institution's
-Codespaces allocation before class; stop your codespace after use.
-
-## Verification
-
-```bash
-python3 scripts/check.py
-.venv/bin/python -m mkdocs build --strict
-```
-
-The check executes the core commands in a temporary workspace, never your work folder.
-See [teaching notes](docs/teaching.md) for timing and source mapping.
-Solutions are openly available for self-study, not protected assessment material.
+.github/workflows/check.yml validates pushes and pull requests without publishing.
+pages.yml publishes only when manually run on main, after review; it uploads only
+site/. Remove or disable an existing automatic Pages workflow before integration,
+because that workflow might otherwise publish on push.
