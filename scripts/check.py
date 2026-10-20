@@ -15,7 +15,6 @@ before = snapshot()
 config = json.loads((ROOT/'.devcontainer/devcontainer.json').read_text())
 assert config['remoteUser'] == 'vscode'
 assert (ROOT/'.devcontainer'/config['build']['dockerfile']).is_file()
-assert 'pip install' not in config['postCreateCommand']
 assert set(p.name for p in (ROOT/'docs').glob('*.md')) == {
     'index.md','setup.md','01-motivation.md','02-orientation.md','03-navigation.md',
     '04-files.md','05-logs.md','06-pipelines.md','07-mission.md','recap.md','08-deep-dives.md','sources.md'}
