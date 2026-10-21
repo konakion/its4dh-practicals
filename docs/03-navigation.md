@@ -1,5 +1,10 @@
 # 3 · Navigate without getting lost
 
+<div class="learning-lab" data-step="navigation"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
 **Core path · 18–30 minutes** · Read → predict → run → explain.
 
 ## Why this matters
@@ -16,7 +21,7 @@ directory; it does not move a file. With no argument, `cd` goes home.
 repository root
 ├── data
 │   ├── config
-│   └── logs / platform.log
+│   └── logs / platform.log, upload_small.log, upload.log
 └── work (created in chapter 4)
 ```
 
@@ -49,7 +54,7 @@ ls ./data/config
 
 ```text
 [repository path]/data
-platform.log
+platform.log  upload.log  upload_small.log
 README.txt  config  logs
 [repository path]
 [home path, typically /home/vscode]
@@ -79,6 +84,10 @@ From data/logs, does ../config refer to the repository config directory?
     Yes: .. is data, so ../config reaches data/config. From data/config, cd ../.. returns to the repository. A leading / would instead start at the filesystem root.
 
 ## Mini-challenge
-Use an absolute path to list the log from home without moving it: after cd ~, try ls "$ROOT/data/logs", then cd "$ROOT". Expected: platform.log.
+Use an absolute path to list the log from home without moving it: after cd ~, try ls "$ROOT/data/logs", then cd "$ROOT". Expected: platform.log, upload.log and upload_small.log.
 
 [Continue →](04-files.md) · [Core path map](index.md)
+
+</details>
+
+[Next learning step →](04-files.md) · [Learning path](index.md)

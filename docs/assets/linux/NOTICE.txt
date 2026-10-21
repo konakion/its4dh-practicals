@@ -1,0 +1,11 @@
+Local prototype assets, retrieved 2026-10-22 (Europe/Berlin).
+Exact bytes are pinned by SHA-256 in manifest.json; download URLs are mutable upstream URLs.
+v86: https://github.com/copy/v86 (BSD-2-Clause; LICENSE.v86 included).
+Linux/BusyBox image: https://i.copy.sh/buildroot-bzimage68.bin
+Upstream image provenance/build recipes: https://github.com/copy/v86/tree/master/tools
+Kernel and BusyBox include GPL components. Firmware: SeaBIOS and VGABIOS, see upstream v86 bios/.
+This is a LOCAL prototype. Before redistribution, obtain and retain the exact corresponding
+kernel/BusyBox source/configuration and all firmware notices/licenses, or replace this image
+with a reproducible owned build and provide its corresponding sources. The current image
+has not been reconstructed from source here. v86's BSD license alone does not cover the image.
+No runtime CDN request, networking proxy or telemetry is configured.

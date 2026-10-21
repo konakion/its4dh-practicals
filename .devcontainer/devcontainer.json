@@ -1,5 +1,5 @@
 {
-  "name": "Principles of IT Systems \u2014 Practical 01",
+  "name": "ITS4DH — Practical 01",
   "build": {
     "dockerfile": "Dockerfile"
   },

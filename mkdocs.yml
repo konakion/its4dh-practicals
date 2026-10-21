@@ -16,6 +16,7 @@ plugins:
 markdown_extensions:
   - admonition
   - tables
+  - md_in_html
   - attr_list
   - pymdownx.details
   - pymdownx.superfences
@@ -33,3 +34,9 @@ nav:
   - Take home: recap.md
   - 8 · Optional deep dives: 08-deep-dives.md
   - Sources: sources.md
+
+extra_css:
+  - assets/learning.css
+extra_javascript:
+  - assets/shell-lab.js
+  - assets/learning.js

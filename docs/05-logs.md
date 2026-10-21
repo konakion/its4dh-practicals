@@ -1,5 +1,10 @@
 # 5 · Read and search Digital Health logs
 
+<div class="learning-lab" data-step="logs"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
 **Core path · 45–60 minutes** · Read → predict → run → explain.
 
 ## Why this matters
@@ -78,3 +83,7 @@ Would searching for lowercase error produce the same result? Do three connection
 Show only the last band-03 record after reading chapter 6, or identify it manually now. Explain why one final accepted upload is a limited claim.
 
 [Continue →](06-pipelines.md) · [Core path map](index.md)
+
+</details>
+
+[Next learning step →](06-pipelines.md) · [Learning path](index.md)

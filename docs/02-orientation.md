@@ -1,5 +1,10 @@
 # 2 · Who and where am I?
 
+<div class="learning-lab" data-step="orientation"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
 **Core path · 10–18 minutes** · Read → predict → run → explain.
 
 ## Why this matters
@@ -48,7 +53,7 @@ version. `-l` adds permissions, owner, size and date; `-a` includes names starti
 with a dot. `cat` prints a short text file. Successful commands may print no output.
 
 ## Your turn
-Run `ls data/logs`. Find the one log filename. Then list `data/config` without changing directories.
+Run `ls data/logs`. Find the three log filenames. Then list `data/config` without changing directories.
 
 ## Checkpoint
 Which command answers “where am I”, and which answers “which kernel”?
@@ -60,9 +65,13 @@ Which command answers “where am I”, and which answers “which kernel”?
     Pass data/config as the argument to ls.
 
 ??? success "Check your understanding — open after trying"
-    pwd gives the working directory; uname gives the kernel. data/logs contains platform.log. The config directory contains platform.conf and platform.conf.backup.
+    pwd gives the working directory; uname gives the kernel. data/logs contains platform.log, upload_small.log and upload.log. The config directory contains platform.conf and platform.conf.backup.
 
 ## Mini-challenge
 Predict whether `ls -a` can reveal hidden names. Check with `ls -a data`; the entries . and .. are included. Explain -a in one sentence.
 
 [Continue →](03-navigation.md) · [Core path map](index.md)
+
+</details>
+
+[Next learning step →](03-navigation.md) · [Learning path](index.md)

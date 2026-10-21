@@ -1,5 +1,10 @@
 # 1 · Why learn a Linux terminal?
 
+<div class="learning-lab" data-step="terminal"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
 **Core path · 0–10 minutes** · Read → predict → run → explain.
 
 ## Why this matters
@@ -72,3 +77,7 @@ Does a GUI bypass the kernel? Is Bash the kernel?
 Explain to an imaginary colleague why a browser on Windows can show a Linux shell. Check: the computation runs remotely, while your laptop displays the session.
 
 [Continue →](02-orientation.md) · [Core path map](index.md)
+
+</details>
+
+[Next learning step →](02-orientation.md) · [Learning path](index.md)

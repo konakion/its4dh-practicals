@@ -1,5 +1,12 @@
 # 4 · Preserve evidence; work on copies
 
+<div class="learning-lab" data-step="files"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
+The interactive example above already creates work/. The full walkthrough below is an alternative first-run route; do not rerun its mkdir work setup over your existing work. Preserve your files.
+
 **Core path · 30–45 minutes** · Read → predict → run → explain.
 
 ## Why this matters
@@ -78,3 +85,7 @@ If you need both original and renamed evidence, should you use cp or mv?
 Copy the configuration to "work/scratch/config copy.txt" and print it. Check: the text matches platform-copy.conf. Explain why the destination needs quotes.
 
 [Continue →](05-logs.md) · [Core path map](index.md)
+
+</details>
+
+[Next learning step →](05-logs.md) · [Learning path](index.md)

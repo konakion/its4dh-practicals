@@ -1,5 +1,10 @@
 # 7 · Independent mission: wearable-platform incident
 
+<div class="learning-lab" data-step="mission"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
 **Core path · 73–85 minutes**
 
 ## Why this matters
@@ -61,3 +66,7 @@ Hint: compare adjacent lines with cat -n. Check: band-05's warning at 09:17 is f
 by an accepted upload at 09:18. A warning does not necessarily predict a failure.
 
 [Continue to the five-minute recap →](recap.md)
+
+</details>
+
+[Next learning step →](recap.md) · [Learning path](index.md)

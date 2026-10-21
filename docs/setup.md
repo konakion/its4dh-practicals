@@ -3,7 +3,7 @@
 Use these two links throughout the course:
 
 1. [Public handbook](https://konakion.github.io/its4dh-practicals/)
-2. [Create your own course Codespace](https://codespaces.new/konakion/its4dh-practicals)
+2. [Create your own course Codespace](https://codespaces.new/konakion/its4dh-practicals){ target="_blank" rel="noopener" }
 
 The revised instructions become valid for that repository **after the instructor
 has reviewed and published this update**. The downloaded preview already contains

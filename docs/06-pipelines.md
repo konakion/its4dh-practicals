@@ -1,5 +1,10 @@
 # 6 · Connect tools and save results
 
+<div class="learning-lab" data-step="pipelines"></div>
+
+<details class="chapter-reference" markdown="1">
+<summary>Reference, guided walkthrough and extra practice</summary>
+
 **Core path · 60–73 minutes** · Read → predict → run → explain.
 
 ## Why this matters
@@ -73,3 +78,7 @@ What happens if you replace >> with > for the second printf? Does uniq -c count 
 Group all log records by severity using cut -d " " -f 2, sort and uniq -c. Check: ERROR 6, INFO 11, WARN 3 (sorted alphabetically). Explain why summing counts should give 20.
 
 [Continue →](07-mission.md) · [Core path map](index.md)
+
+</details>
+
+[Next learning step →](07-mission.md) · [Learning path](index.md)

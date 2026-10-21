@@ -13,6 +13,10 @@ All records are synthetic; use no patient data.
    YOU ARE HERE: Practical 01
 ```
 
+## Learn → run → transfer → recall
+
+Each core chapter from Terminal entry onwards has an interactive transfer lab. Run Linux commands in your Codespace, then paste results here for feedback. The static handbook never executes shell commands. Any correct command producing the required evidence is welcome. Progress is saved in this browser only; it is self-assessment, not a grade. Use Quiz review to revisit missed questions and reset it tomorrow for spaced repetition.
+
 ## Before you start
 Open [your Linux workspace](setup.md). Do this before class where possible.
 Keep this public handbook in one browser tab and your own Codespace in another.

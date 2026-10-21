@@ -1,0 +1,8 @@
+09:00 INFO band-01 upload accepted
+09:01 ERROR band-02 connection refused
+09:02 INFO band-01 upload accepted
+09:03 WARN band-03 battery low
+09:04 ERROR band-02 connection refused
+09:05 ERROR band-03 upload timeout
+09:06 INFO band-03 upload accepted
+09:07 ERROR band-01 connection refused
