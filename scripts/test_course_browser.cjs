@@ -15,39 +15,8 @@ const os = require('node:os');
 const BASE = (process.env.PREVIEW_URL || 'http://127.0.0.1:8000/its4dh-practicals/').replace(/\/?$/, '/');
 const OUT = process.env.TEST_ARTIFACT_DIR || os.tmpdir();
 
-// Per exercise: wrong commands (with expected feedback), alternative correct solutions.
-// `undo` runs directly in Linux afterwards so that the next attempt starts cleanly.
-const CASES = {
-  'terminal/first-command': { wrong: [['hostnme', /does not know the command/], ['whoami', /not what the task asks/]], alts: ['uname -n'] },
-  'terminal/pwd': { wrong: [['pwd', /Only one line/], ['pwd\nwhoami', /other way round/], ['echo "oops', /quote/]], alts: ['whoami; pwd', 'echo $USER\necho $PWD'] },
-  'terminal/ls': { wrong: [['ls', /list of your current folder/], ['ls note', /does not exist/]], alts: ['ls ~/notes', 'ls -l notes', 'cd notes; ls'] },
-  'terminal/ls-l': { wrong: [['ls -lh data', /exact size in bytes/], ['ls -l notes', /notes folder/], ['ls data', /not what the task asks/]], alts: ['ls -la data', 'ls -l ~/data', 'cd data; ls -l'] },
-  'navigate/cd': { wrong: [['cd dat', /does not exist/], ['cd notes', /not in the data folder/]], alts: ['cd ~/data', 'cd /home/student/data'] },
-  'navigate/dotdot': { wrong: [['ls', /data folder itself/], ['ls config', /neighbour of data/], ['ls ~/config', /This exercise is about/]], alts: ['cd ..; ls config', 'ls ../config/'] },
-  'navigate/tilde': { wrong: [['cd config', /no config folder in \/usr\/share/], ['cd ~', /not in your config folder/]], alts: ['cd /home/student/config', 'cd\ncd config'] },
-  'navigate/absolute': { wrong: [['cd ~/notes', /full absolute path/], ['cd notes', /does not exist/]], alts: ['cd /home/student/notes/'] },
-  'files/cat': { wrong: [['cat notes', /is a folder/], ['cat welcome.txt', /does not exist/]], alts: ['cat ~/notes/welcome.txt', 'cd notes; cat welcome.txt'] },
-  'files/mkdir': { wrong: [['mkdir Reports', /no folder ~\/reports/, 'rmdir ~/Reports'], ['mkdir', /not valid|not what/]], alts: ['mkdir ~/reports', 'mkdir -p reports'] },
-  'files/touch': { wrong: [['touch incident.txt', /home folder, not in reports/, 'rm -f ~/incident.txt'], ['touch reports/incident.text', /no file reports\/incident\.txt/, 'rm -f ~/reports/incident.text']], alts: ['cd reports; touch incident.txt'] },
-  'files/cp': { wrong: [['cp upload_small.log reports', /does not exist/], ['cp data/upload.log reports/', /no copy/, 'rm -f ~/reports/upload.log']], alts: [['cp ~/data/upload_small.log ~/reports/sample.log', 'rm -f ~/reports/sample.log'], ['cd reports; cp ../data/upload_small.log .', 'rm -f ~/reports/upload_small.log']] },
-  'files/mv': { wrong: [['cp reports/incident.txt reports/incident-2026-10-19.txt', /That happens with cp/, 'rm -f ~/reports/incident-2026-10-19.txt'], ['mv reports/incident.txt incident-2026-10-19.txt', /no reports\/incident-2026-10-19\.txt/, 'mv ~/incident-2026-10-19.txt ~/reports/incident.txt']], alts: [['cd reports; mv incident.txt incident-2026-10-19.txt', 'mv ~/reports/incident-2026-10-19.txt ~/reports/incident.txt']] },
-  'files/rm': { wrong: [['rm data/upload_small.log', /protected evidence/], ['rm reports/*', /so is your incident file/]], alts: ['cd reports; rm upload_small.log'] },
-  'inspect/head': { wrong: [['head data/upload.log', /10 lines, the default/], ['head -n 5 data/upload_small.log', /records from the sample/]], alts: ['head -5 data/upload.log', 'head -n 5 ~/data/upload.log', 'cat data/upload.log | head -n 5'] },
-  'inspect/tail': { wrong: [['tail data/upload.log', /Without -n/], ['head -n 1 data/upload.log', /not what the task asks/]], alts: ['tail -1 data/upload.log', 'tail -n 1 ~/data/upload.log'] },
-  'inspect/wc': { wrong: [['wc -l data/upload_small.log', /size of the sample/], ['wc data/upload.log', /not what the task asks/]], alts: ['wc -l < data/upload.log', 'cat data/upload.log | wc -l', 'wc -l ~/data/upload.log'] },
-  'search/grep': { wrong: [['grep connection refused data/upload_small.log', /Without quotes the shell split/], ['grep "Connection refused" data/upload_small.log', /letter case/]], alts: ['grep "connection refused" data/upload_small.log', 'grep -F refused data/upload_small.log', 'cat data/upload_small.log | grep refused'] },
-  'search/grep-c': { wrong: [['grep -c error data/upload.log', /case-sensitive/], ['grep -c ERROR data/upload_small.log', /count for the sample/], ['grep ERROR data/upload.log', /lines themselves/]], alts: ['grep ERROR data/upload.log | wc -l', "grep -c ' ERROR ' data/upload.log", 'grep -cF ERROR ~/data/upload.log'] },
-  'search/grep-device': { wrong: [['grep band-42 data/upload.log', /found or printed nothing/], ['grep band-042 data/upload_small.log', /found or printed nothing/]], alts: ['grep -F band-042 data/upload.log', 'cat data/upload.log | grep band-042'] },
-  'search/grep-F': { wrong: [['grep -c . notes/welcome.txt', /11 is the number of non-empty lines/]], alts: ["grep -cF '.' notes/welcome.txt", 'grep -F . notes/welcome.txt | wc -l'] },
-  'combine/pipe': { wrong: [["grep 'connection refused' data/upload.log", /all 50 matching records/], ["grep 'connection refused' data/upload.log | head -n 3", /not what the task asks/]], alts: ['grep refused data/upload.log | tail -3', "cat data/upload.log | grep 'connection refused' | tail -n 3"] },
-  'combine/redirect': { wrong: [['grep ERROR data/upload.log', /no file reports\/errors\.txt/], ['grep ERROR data/upload_small.log > reports/errors.txt', /does not contain exactly/]], alts: ["grep ' ERROR ' data/upload.log > reports/errors.txt", 'cd reports; grep ERROR ../data/upload.log > errors.txt'] },
-  'combine/append': { wrong: [["grep -c 'connection refused' data/upload.log > reports/summary.txt", /title has disappeared/], ['echo hello >> reports/summary.txt', /no line with the correct count/]], alts: ["echo \"connection refused: $(grep -c 'connection refused' data/upload.log)\" >> reports/summary.txt", "grep 'connection refused' data/upload.log | wc -l >> reports/summary.txt"] },
-  'mission/window': { wrong: [['grep ERROR data/upload.log | head -n 1', /One of the two records/], ['grep ERROR data/upload.log | tail -n 1\ngrep ERROR data/upload.log | head -n 1', /not what the task asks/]], alts: ['grep -m 1 ERROR data/upload.log; grep ERROR data/upload.log | tail -n 1'] },
-  'mission/narrow': { wrong: [["grep '09:04' data/upload.log | grep ERROR", /not what the task asks/]], alts: ['grep timeout data/upload.log | grep 09:04', "grep '09:04 ERROR' data/upload.log | grep -F 'upload timeout'"] },
-  'mission/report': { wrong: [['grep -c ERROR data/upload.log > reports/report.txt', /not have exactly three lines/], ["grep -c 'upload timeout' data/upload.log > reports/report.txt\ngrep -c 'connection refused' data/upload.log >> reports/report.txt\ngrep -c WARN data/upload.log >> reports/report.txt", /count is wrong/]], alts: ["echo \"errors: $(grep -c ERROR data/upload.log)\" > reports/report.txt\necho \"refused: $(grep -c 'connection refused' data/upload.log)\" >> reports/report.txt\necho \"timeouts: $(grep -c timeout data/upload.log)\" >> reports/report.txt"] },
-  'bonus/frequency': { wrong: [["cut -d ' ' -f 4- data/upload.log | sort | uniq -c", /not what the task asks/]], alts: ["grep ERROR data/upload.log | cut -d ' ' -f 4- | sort | uniq -c | sort -rn"] },
-  'bonus/distinct': { wrong: [["cut -d ' ' -f 3 data/upload.log | wc -l", /counts every record/]], alts: ["cut -d ' ' -f 3 data/upload.log | sort | uniq | wc -l"] },
-};
+// Wrong commands (with expected feedback) and alternative correct solutions per exercise.
+const CASES = require('./learning_cases.cjs');
 
 const norm = s => s.replace(/\r/g, '').split('\n').map(l => l.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
 const maskDates = s => s.replace(/[A-Z][a-z]{2} +\d+ \d\d:\d\d/g, 'DATE');
@@ -168,6 +137,13 @@ const ok = (msg) => { passed++; console.log('PASS', msg); };
   r = await run('cat');
   assert.match(r.text, /printed nothing|not what/);
   ok('endless loop stopped after 10 s, session survives; stdin-reading command returns');
+
+  // Linux needs no network once it has started
+  await page.context().setOffline(true);
+  r = await run('whoami; pwd');
+  assert.match(r.cls, /\bok\b/);
+  await page.context().setOffline(false);
+  ok('commands still run with the browser offline');
 
   // state persists between exercises; files survive navigation
   r = await page.evaluate(() => window.practicalLinux.exec('cat ~/reports/report.txt; ls ~/reports'));

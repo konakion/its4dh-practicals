@@ -47,7 +47,7 @@ Open http://127.0.0.1:8000/its4dh-practicals/ (MkDocs serves the GitHub Pages ba
 
 ```bash
 .venv/bin/python scripts/check.py          # datasets, browser copies, Linux image checksums
-node scripts/test_checker.cjs              # result checker unit tests
+node scripts/test_learning.cjs             # checker, content structure, every example and exercise in a shell
 .venv/bin/python -m mkdocs build --strict
 .venv/bin/python scripts/check_site.py     # links and base path in site/
 ```
