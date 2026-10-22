@@ -1,0 +1,12 @@
+From: Lena, PulseBridge operations lead
+To: junior system administrator
+
+Good morning and welcome to the team!
+This morning some wristbands could not upload their measurements.
+Our upload server writes every attempt to a log file.
+You find the logs in the data folder:
+  upload_small.log  a short sample with 8 records
+  upload.log        the full morning with 1000 records
+Please find out what went wrong and write a short report.
+Keep the data folder as it is, it is our evidence.
+Thanks, Lena

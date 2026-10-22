@@ -1,67 +1,37 @@
-> Update 22 October 2026: chapter 5 now executes real browser Linux. See
-> [SHELL-PROTOTYPE.md](SHELL-PROTOTYPE.md) for current architecture and verified results.
-> Older pasted-output descriptions below apply to the other chapters only.
+# Verification, 22 October 2026
 
-# Local verification · 22 October 2026
+Redesign of Practical 01 as an interactive course with real browser Linux in every chapter.
+No commit, push or deployment was made.
 
-Changes made only in /Users/konak/Downloads/practical-01. No push, deployment,
-remote setting change or Codespace creation. Existing data/.DS_Store modification
-predated this work and was left untouched. Remote: konakion/its4dh-practicals;
-local main tracks origin/main. Remote reachability and live Pages settings were not tested.
+## Automated results
 
-PASS:
-- Existing handbook command/exercise checks, optional noninteractive labs and fixture integrity.
-- Exact upload_small.log counts: 8 lines, 4 ERROR; upload.log: 1000 lines, 100 ERROR.
-  Actual paths are data/logs/, not data/. No cheat sheet exists in this checkout.
-- Strict MkDocs build: 13 pages; 460 internal links/assets/anchors validated.
-- Seven browser result validators, whitespace and listing-order variants, variable
-  workspace prefixes, wrong/empty/HTML-like inputs and failed checker reports.
-- Real artifact checks using temporary copies: missing artifacts fail; an alternative
-  awk filter passes; saving just a count instead of error evidence fails; source edits fail.
-- Browser: incorrect and correct result feedback, MC explanations, progress increment,
-  persistence after reload, and missed-question review spanning other chapters.
-- Narrow browser layout visually inspected: inputs, quiz, controls and navigation fit.
-- JavaScript syntax and git diff whitespace checks.
+| Check | Result |
+|---|---|
+| `python3 scripts/check.py` | PASS: datasets unchanged (8 records/4 ERROR, 1,000 records/100 ERROR, 50 connection refused, 50 upload timeout, 100 devices); browser copies byte-identical to `data/`; Linux image matches `manifest.json` |
+| `node scripts/test_checker.cjs` | PASS: comparison modes, diagnoses, error explanations, feedback for every reason code |
+| `mkdocs build --strict --clean` | PASS (MkDocs 1.6.1, custom theme, no Material dependency) |
+| `python3 scripts/check_site.py` | PASS: all links and assets relative, valid under `/its4dh-practicals/` |
+| `node scripts/test_course_browser.cjs` (Chromium, static server under the Pages base path) | ALL PASS, 49 checks |
+| `mkdocs serve` preview | Linux boots, exercise checked correctly, no failed requests |
 
-Infrastructure retained: pinned MkDocs/Material dependencies, existing devcontainer,
-Bash Linux utilities and post-create checks. Local CI now also includes learning
-regressions and generated-link validation. Deployment is manual workflow_dispatch only;
-the previous automatic main push trigger conflicted with README and was removed locally.
+The browser test covers, against the real Linux in the page:
 
-Limits: no Docker/container build, Linux CI or real Codespace lifecycle test performed.
-No published site was changed. Browser checks validate pasted results, not command
-execution or student identity. check_work.py reads actual learner files and verifies
-source hashes, evidence lines, configuration copy and report structure. It cannot judge
-clinical interpretation; use peer review. Seven public quiz keys are formative.
+- all 29 example outputs reproduced exactly (dates masked for `ls -l`);
+- all 29 exercises: 58 typical wrong commands with the expected feedback, 55 alternative correct
+  solutions, and every model solution;
+- examples differ from solutions in every step; consistent Learn / Example / Your turn sections;
+- hints and solution reveal; endless loop stopped after 10 s with the session intact;
+  `cat` without input returns immediately; files persist across chapters;
+- all 8 quizzes: answers hidden before submission, every option explained afterwards, retry,
+  full score; mixed review on the completion page;
+- progress after reload, Restart Linux (fresh files, progress kept), Reset my progress;
+- layout at 390, 768 and 1366 px without horizontal overflow; Enter runs a command;
+- no page errors and no failed HTTP requests.
 
-Preview (from repository root):
+Boot time in the test container: about 9.5 s (includes 12 MB of emulator assets from a local
+server). `crossOriginIsolated` is false: no special headers are needed, so GitHub Pages works as is.
 
-```bash
-.venv/bin/python -m mkdocs serve --dev-addr 127.0.0.1:8000
-```
+## Not tested
 
-Open http://127.0.0.1:8000/its4dh-practicals/ . Node is needed only for maintainer
-JavaScript tests; learners need Python and Linux utilities in their Codespace.
-
----
-
-## Previous verification record (20 October 2026)
-
-# Verification · 20 October 2026
-
-PASS locally on macOS with Bash and Python 3.12:
-- All noninteractive core Bash blocks from chapters 1–7 run sequentially in one temporary workspace.
-- Exercise copies/deletions, exact event counts, warning/error line numbers, device history, service/severity grouping and unchanged source fixture bytes.
-- Both normal and unified diff: expected exit status 1 for differences; semantic old/new values replace dependence on a normal-diff hunk header.
-- Optional noninteractive find, diff, script, chmod, aliases, client discovery and localhost HTTP/curl labs. Bash alias expansion is explicitly enabled in the noninteractive test shell; interactive Bash enables it by default.
-- mkdocs build --strict --clean, MkDocs 1.6.1 and Material 9.6.23.
-- Generated HTML: 13 pages; 420 local links, assets and fragment targets.
-- No solutions/ or teaching/ page, no private instructor files in student archive, no legacy solution entries in search index.
-- Source fixtures exactly match the supplied ZIP.
-- Browser spot check of narrow layout, chapter navigation and expansion of a staged hint.
-
-Not executed: Linux CI, container build (Docker daemon unavailable), a real Codespace, its stop/resume lifecycle, live Pages deployment, full interactive editor/viewer keyboard workflows or an actual SSH/SCP transfer. GNU grep --help is not executed on this macOS host because BSD grep differs; Linux CI executes it. The local uname result is Darwin; Linux is the expected result inside the intended container. Post-create checks test exercises in isolation, not the learner's own work.
-
-External links have been statically reviewed, not all verified live. GitHub API and main-branch archive requests returned 404; the public handbook fetch failed. Therefore live repository configuration, default branch, existing workflows and current deployment were not verified. GitHub billing and lifecycle guidance was checked against official GitHub Docs; account-specific allowances may change.
-
-See the private teaching guide for manual release acceptance. No GitHub push, external publication, Codespace creation or paid action was performed. site/ is a generated local preview only. Public handbook use does not require students to install MkDocs.
+Firefox, Safari, real phones and tablets, screen readers, the live GitHub Pages deployment and the
+GitHub Actions run itself.

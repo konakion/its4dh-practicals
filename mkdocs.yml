@@ -1,42 +1,18 @@
-site_name: Practical 01 · IT Systems for Digital Health
+site_name: "Practical 01: Linux terminal fundamentals"
 site_url: https://konakion.github.io/its4dh-practicals/
-site_description: A guided 90-minute Linux practical for HPI Digital Health students
+site_description: An interactive 90-minute Linux practical for HPI Digital Health students, with real Linux running in the browser.
 strict: true
+use_directory_urls: true
 theme:
-  name: material
-  palette:
-    primary: teal
-    accent: amber
-  features:
-    - navigation.footer
-    - navigation.top
-    - content.code.copy
-plugins:
-  - search
+  name: null
+  custom_dir: theme
+  static_templates:
+    - 404.html
+plugins: []
 markdown_extensions:
-  - admonition
   - tables
-  - md_in_html
   - attr_list
-  - pymdownx.details
-  - pymdownx.superfences
+  - md_in_html
 nav:
-  - Start here: index.md
-  - Linux workspace: setup.md
-  - Core path:
-    - 1 · Motivation: 01-motivation.md
-    - 2 · Orientation: 02-orientation.md
-    - 3 · Navigation: 03-navigation.md
-    - 4 · Safe files: 04-files.md
-    - 5 · Logs: 05-logs.md
-    - 6 · Pipelines: 06-pipelines.md
-    - 7 · Mission: 07-mission.md
-  - Take home: recap.md
-  - 8 · Optional deep dives: 08-deep-dives.md
-  - Sources: sources.md
-
-extra_css:
-  - assets/learning.css
-extra_javascript:
-  - assets/shell-lab.js
-  - assets/learning.js
+  - Practical: index.md
+  - About: about.md
