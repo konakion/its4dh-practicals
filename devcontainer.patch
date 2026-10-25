@@ -1,0 +1,20 @@
+diff --git a/.devcontainer/Dockerfile b/.devcontainer/Dockerfile
+index d10f173..55c50b0 100644
+--- a/.devcontainer/Dockerfile
++++ b/.devcontainer/Dockerfile
+@@ -1,3 +1,3 @@
+ FROM mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+-RUN apt-get update && apt-get install -y --no-install-recommends bash coreutils grep findutils diffutils less man-db manpages && rm -rf /var/lib/apt/lists/*
++RUN apt-get update && apt-get install -y --no-install-recommends bash coreutils grep findutils diffutils less man-db manpages nano vim procps psmisc && rm -rf /var/lib/apt/lists/*
+ ENV LC_ALL=C.UTF-8
+diff --git a/.devcontainer/devcontainer.json b/.devcontainer/devcontainer.json
+index e02ba19..85b4ca2 100644
+--- a/.devcontainer/devcontainer.json
++++ b/.devcontainer/devcontainer.json
+@@ -1,5 +1,5 @@
+ {
+-  "name": "ITS4DH — Practical 01",
++  "name": "ITS4DH Practical Lab",
+   "build": {
+     "dockerfile": "Dockerfile"
+   },

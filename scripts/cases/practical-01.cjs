@@ -1,5 +1,5 @@
 /*
- * Test cases for every exercise, shared by test_learning.cjs (offline, system shell)
+ * Test cases for every exercise of Practical 01, shared by test_learning.cjs (offline, system shell)
  * and test_course_browser.cjs (real browser Linux, also checks the feedback texts).
  */
 // Per exercise: wrong commands (with expected feedback), alternative correct solutions.

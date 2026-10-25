@@ -1,7 +1,7 @@
 /*
  * Main-thread client for shell-worker.js. One LinuxSession = one real Linux VM.
  * Usage:
- *   const linux = new LinuxSession(files, onState);
+ *   const linux = new LinuxSession(files, onState, { prelude: 'PATH=...' });
  *   await linux.ready;
  *   const r = await linux.exec('ls -l', 'optional probe');
  */
@@ -11,8 +11,9 @@
   const HARD_LIMIT_MS = 30000; // the worker stops runaway commands after 10 s itself
 
   class LinuxSession {
-    constructor(files, onState = () => {}) {
+    constructor(files, onState = () => {}, options = {}) {
       this.files = files;
+      this.prelude = options.prelude || '';
       this.onState = onState;
       this.seq = 0;
       this.pending = new Map();
@@ -46,7 +47,7 @@
       return Promise.all(this.files.map(async f => {
         const response = await fetch(new URL(f.url, base));
         if (!response.ok) throw Error('Could not load ' + f.path);
-        return { path: f.path, readOnly: !!f.readOnly, content: await response.text() };
+        return { path: f.path, readOnly: !!f.readOnly, exec: !!f.exec, content: await response.text() };
       }));
     }
 
@@ -71,7 +72,7 @@
     async exec(command, probe) {
       await this.ready;
       this.onState('running');
-      try { return await this.call({ type: 'exec', command, probe }); }
+      try { return await this.call({ type: 'exec', command, probe, prelude: this.prelude }); }
       finally { if (this.state === 'ready') this.onState('ready'); }
     }
 

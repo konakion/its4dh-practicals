@@ -1,0 +1,12 @@
+#!/bin/sh
+# analyse: a deliberately CPU-hungry program for the ITS4DH practical.
+#
+#   analyse [SECONDS]          default 60, then it stops by itself
+#
+# It only counts, it never waits: the classic CPU-bound process.
+exec </dev/null >/dev/null 2>&1
+end=$(($(date +%s) + ${1:-60}))
+while [ "$(date +%s)" -lt "$end" ]; do
+  i=0
+  while [ "$i" -lt 3000 ]; do i=$((i + 1)); done
+done

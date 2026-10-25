@@ -76,8 +76,9 @@ async function boot(files) {
     const target = `${HOME}/${file.path}`;
     const dir = target.slice(0, target.lastIndexOf('/'));
     const owner = file.readOnly ? 'root:root' : 'student:student';
+    const mode = file.readOnly ? (file.exec ? 555 : 444) : (file.exec ? 755 : 644);
     await send(`mkdir -p '${dir}'; cp /mnt/${tmp} '${target}'; rm -f /mnt/${tmp}; ` +
-      `chown ${owner} '${dir}' '${target}'; chmod ${file.readOnly ? 444 : 644} '${target}'; chmod 755 '${dir}'`);
+      `chown ${owner} '${dir}' '${target}'; chmod ${mode} '${target}'; chmod 755 '${dir}'`);
   }
   await send(`cd ${HOME}`);
   await vm.stop();
@@ -88,17 +89,20 @@ async function boot(files) {
 /*
  * Run a command as "student" in the current directory, then run an optional
  * read-only probe (used by the exercise checker) in the resulting directory.
+ * An optional prelude (per practical, e.g. PATH or job control) is sourced first,
+ * in the same shell, so it never shifts the line numbers in error messages.
  * A trailing "x" is appended to every output file because v86's 9p API cannot
  * read zero-byte files; read() removes it again.
  */
-async function exec(command, probe) {
+async function exec(command, probe, prelude) {
+  await vm.create_file('prelude.sh', enc((prelude || ':') + '\n'));
   await vm.create_file('task.sh', enc(command + '\n'));
   await vm.create_file('probe.sh', enc((probe || ':') + '\n'));
   const line =
-    "su student -s /bin/sh -c 'ulimit -f 2048; trap \"pwd >&3\" EXIT; . /mnt/task.sh' " +
+    "su student -s /bin/sh -c 'ulimit -f 2048; trap \"pwd >&3\" EXIT; . /mnt/prelude.sh; . /mnt/task.sh' " +
     '</dev/null >/mnt/o 2>/mnt/e 3>/mnt/cwd; echo $? >/mnt/st; ' +
     'c=$(cat /mnt/cwd); [ -n "$c" ] && [ -d "$c" ] && cd "$c"; ' +
-    "su student -s /bin/sh -c '. /mnt/probe.sh' </dev/null >/mnt/po 2>&1; echo $? >/mnt/pst; " +
+    "su student -s /bin/sh -c '. /mnt/prelude.sh; . /mnt/probe.sh' </dev/null >/mnt/po 2>&1; echo $? >/mnt/pst; " +
     'pwd >/mnt/pwd; for f in o e po; do printf x >>/mnt/$f; done';
   let timedOut = false, restarted = false;
   if (!await send(line, RUN_TIMEOUT_MS)) {
@@ -131,7 +135,7 @@ self.onmessage = ({ data }) => {
   queue = queue.then(async () => {
     try {
       if (data.type === 'boot') { await boot(data.files); self.postMessage({ id: data.id, type: 'ready' }); }
-      else if (data.type === 'exec') self.postMessage({ id: data.id, type: 'result', ...(await exec(data.command, data.probe)) });
+      else if (data.type === 'exec') self.postMessage({ id: data.id, type: 'result', ...(await exec(data.command, data.probe, data.prelude)) });
       else if (data.type === 'reset') { await reset(); self.postMessage({ id: data.id, type: 'ready' }); }
     } catch (error) {
       self.postMessage({ id: data.id, type: 'error', message: error.message || String(error) });

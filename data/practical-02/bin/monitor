@@ -1,0 +1,31 @@
+#!/bin/sh
+# monitor: a simulated bedside monitor for the ITS4DH practical (synthetic data only).
+#
+#   monitor BED [SECONDS]      for example: monitor bed-07 3
+#
+# Every second it appends one reading to ~/ward/BED.log. It stops by itself after
+# SECONDS (default 300), so a forgotten monitor never runs for long.
+# kill PID (SIGTERM) asks it to stop: it writes a last line into its log and exits.
+# kill -9 PID (SIGKILL) removes it at once: it cannot write anything any more.
+bed=${1:-bed-01}
+seconds=${2:-300}
+dir=$HOME/ward
+log=$dir/$bed.log
+mkdir -p "$dir"
+exec </dev/null >/dev/null 2>&1          # never write to the terminal
+echo "$bed $$ $PPID" >> "$dir/.started"  # for the exercise checker: bed, PID, parent PID
+echo "$$" > "$dir/$bed.pid"
+if [ -n "$MONITOR_FROZEN" ]; then
+  trap '' TERM                            # a frozen program: ignores SIGTERM
+else
+  trap 'echo "$(date +%T) $bed stopped cleanly (SIGTERM), data saved" >> "$log"; rm -f "$dir/$bed.pid"; exit 0' TERM
+fi
+echo "$(date +%T) $bed monitor started" >> "$log"
+i=0
+while [ "$i" -lt "$seconds" ]; do
+  echo "$(date +%T) $bed heart_rate=$((60 + RANDOM % 35)) spo2=$((94 + RANDOM % 6))" >> "$log"
+  /bin/sleep 1 & wait $!                  # wait one second for the next reading
+  i=$((i + 1))
+done
+echo "$(date +%T) $bed monitor finished after $seconds readings" >> "$log"
+rm -f "$dir/$bed.pid"

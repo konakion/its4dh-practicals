@@ -1,0 +1,33 @@
+{
+ "vectors": {
+  "P02-THREADS-2.01": "9NDL",
+  "P02-HELLO": "4QSM"
+ },
+ "codes": {
+  "hello": [
+   "P02-HELLO-4QSM",
+   "P02-HELLO-4QSM"
+  ],
+  "vim": [
+   "P02-VIM-8AEX"
+  ],
+  "sequential": [
+   "P02-SEQUENTIAL-6.02-CC7S"
+  ],
+  "threads": [
+   "P02-THREADS-2.01-9NDL"
+  ],
+  "cpu-threads": [
+   "P02-CPUTHREADS-0.43-0.43-4-SQ9B"
+  ],
+  "cpu": [
+   "P02-CPU-0.43-0.43-0.15-4-47FL"
+  ],
+  "lock": [
+   "P02-LOCK-10-ZL9P"
+  ],
+  "ward": [
+   "P02-WARD-1.51-4-3GDB"
+  ]
+ }
+}

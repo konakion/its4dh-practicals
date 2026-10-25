@@ -1,6 +1,6 @@
-site_name: "Practical 01: Linux terminal fundamentals"
+site_name: "ITS4DH Practical Lab"
 site_url: https://konakion.github.io/its4dh-practicals/
-site_description: An interactive 90-minute Linux practical for HPI Digital Health students, with real Linux running in the browser.
+site_description: Interactive 90-minute practicals for HPI Digital Health students, with real Linux running in the browser.
 strict: true
 use_directory_urls: true
 theme:
@@ -14,5 +14,7 @@ markdown_extensions:
   - attr_list
   - md_in_html
 nav:
-  - Practical: index.md
+  - Practical lab: index.md
+  - "Practical 01: OS fundamentals": practical-01.md
+  - "Practical 02: Processes & threads": practical-02.md
   - About: about.md

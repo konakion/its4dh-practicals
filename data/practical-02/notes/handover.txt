@@ -1,0 +1,11 @@
+From: Lena, PulseBridge operations lead
+To: junior system administrator
+
+Welcome back! Our ward pilot has started: every bed has a small
+monitor program on this server that collects the patient's
+heart rate and oxygen saturation (synthetic test data, of course).
+The programs are in ~/bin, their logs go to ~/ward.
+Please learn how to keep an eye on these processes, and how to
+stop one safely when a patient leaves the ward.
+Never stop processes that you did not start yourself.
+Thanks, Lena

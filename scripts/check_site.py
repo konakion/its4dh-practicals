@@ -39,6 +39,12 @@ for p, page in pages.items():
         count += 1
 assert (ROOT / 'index.html').is_file() and (ROOT / 'about/index.html').is_file() and (ROOT / '404.html').is_file()
 index = (ROOT / 'index.html').read_text()
-for script in ['linux-session.js', 'practical-01.js', 'course-app.js']:
+for script in ['practicals.js', 'course-app.js']:
     assert f'assets/{script}' in index, script
-print(f'PASS: {len(pages)} pages, {count} local links and assets, all relative to the base path')
+practicals = sorted(p.parent.name for p in ROOT.glob('practical-*/index.html'))
+assert practicals, 'no practical pages'
+for slug in practicals:
+    page = (ROOT / slug / 'index.html').read_text()
+    for script in ['practicals.js', 'linux-session.js', f'{slug}.js', 'course-app.js']:
+        assert f'../assets/{script}' in page, (slug, script)
+print(f'PASS: {len(pages)} pages ({", ".join(practicals)}), {count} local links and assets, all relative to the base path')

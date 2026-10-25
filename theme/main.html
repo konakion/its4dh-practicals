@@ -4,23 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if page and page.is_homepage %}{{ config.site_name }}{% else %}{{ page.title }} | {{ config.site_name }}{% endif %}</title>
-  <meta name="description" content="{{ config.site_description }}">
+  <meta name="description" content="{{ page.meta.description or config.site_description }}">
   <meta name="theme-color" content="#0f2529">
   <link rel="icon" href="{{ 'assets/favicon.svg' | url }}" type="image/svg+xml">
   <link rel="preload" href="{{ 'assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2' | url }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ 'assets/practical.css' | url }}">
 </head>
-{% if page and page.is_homepage %}
-<body class="app-page">
+{#- Three kinds of pages:
+    practical: <name> in the page meta -> interactive practical (content file assets/<name>.js)
+    the home page                       -> overview of all practical sessions (assets/practicals.js)
+    everything else                     -> plain text page (about) #}
+{% if page and page.meta.practical %}
+<body class="app-page" data-root="{{ base_url }}/">
   <div id="practical" class="layout">{{ page.content }}</div>
+  <script src="{{ 'assets/practicals.js' | url }}"></script>
   <script src="{{ 'assets/linux-session.js' | url }}"></script>
-  <script src="{{ 'assets/practical-01.js' | url }}"></script>
+  <script src="{{ ('assets/' ~ page.meta.practical ~ '.js') | url }}"></script>
+  <script src="{{ 'assets/course-app.js' | url }}"></script>
+</body>
+{% elif page and page.is_homepage %}
+<body class="lab-page" data-root="{{ base_url }}/">
+  <main id="lab" class="lab">{{ page.content }}</main>
+  <script src="{{ 'assets/practicals.js' | url }}"></script>
   <script src="{{ 'assets/course-app.js' | url }}"></script>
 </body>
 {% else %}
 <body class="doc-page">
   <main class="doc">
-    <a class="doc-back" href="{{ nav.homepage.url | url }}">Back to the practical</a>
+    <a class="doc-back" href="{{ nav.homepage.url | url }}">Back to the practical lab</a>
     {{ page.content }}
   </main>
 </body>
