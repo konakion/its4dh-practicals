@@ -56,7 +56,10 @@
 
   // Every exercise stops the course programs of other steps first. Only the student's own
   // processes exist here.
-  const STOP = 'killall -q admit syncjob crunch 2>/dev/null; sleep 0.2';
+  // Stopped programs can stay visible for a moment (as zombies, until init collects them):
+  // wait until pidof no longer lists them, at most 3 seconds.
+  const STOP = 'killall -q admit syncjob crunch 2>/dev/null; sleep 0.2; ' +
+    'i=0; while pidof admit syncjob crunch >/dev/null && [ $i -lt 30 ]; do sleep 0.1; i=$((i+1)); done';
   const SERVERS = 'mkdir -p ~/ipc; killall -q socat; sleep 0.2; rm -f ~/ipc/inbox.log; station ~/ipc/station.sock & echoserver ~/ipc/echo.sock & ' +
     'i=0; while { [ ! -S ~/ipc/station.sock ] || [ ! -S ~/ipc/echo.sock ]; } && [ $i -lt 30 ]; do sleep 0.1; i=$((i+1)); done';
   const DEADLOCKED = 'syncjob admission records alarms & syncjob alarm alarms records & ' +
@@ -588,7 +591,10 @@ window.PRACTICAL = {
           ],
           example: { cmd: 'nice -n 5 nice', out: '5', note: '`nice` without a command prints the current nice value: here the inner nice was started with 5.' },
           task: 'A backup (`crunch backup 60`) is already running and competes with the ward software for the CPU. Give it the nicest value, **19**, without stopping it.',
-          check: { state: 'sleep 0.2; p=$(pidof crunch); if [ -z "$p" ]; then echo NOT_RUNNING; elif [ "$(cut -d" " -f19 /proc/$p/stat)" = 19 ]; then echo OK; else echo NOT_19; fi' },
+          // The probe waits up to 2 s: a stopped job can stay listed for a moment, and a renice takes effect at once.
+          check: { state: 'live(){ for p in $(pidof crunch); do grep -q "^State:.Z" /proc/$p/status 2>/dev/null || { echo $p; return 0; }; done; return 1; }; ' +
+            'i=0; while p=$(live) && [ "$(cut -d" " -f19 /proc/$p/stat 2>/dev/null)" != 19 ] && [ $i -lt 10 ]; do sleep 0.2; i=$((i+1)); done; ' +
+            'p=$(live); if [ -z "$p" ]; then echo NOT_RUNNING; elif [ "$(cut -d" " -f19 /proc/$p/stat)" = 19 ]; then echo OK; else echo NOT_19; fi' },
           reasons: {
             NOT_RUNNING: 'The backup is not running any more: it was stopped. Click **Reset exercise** to start it again, then change its priority instead of stopping it.',
             NOT_19: 'The backup is running, but its nice value is not 19 yet. Find its PID with `pidof crunch`, then `renice -n 19 -p PID`.',

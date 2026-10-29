@@ -31,6 +31,10 @@ tenths of a second until init collects it, and `pidof` still lists it. `STOP_ALL
 After the fix: `ONLY=practical-02` browser test ALL PASS twice in a row (44 checks each), and the
 full browser test of all three sessions passes: ALL PASS, 108 checks.
 
+Practical 03 had the same effect at `nice/nice` on GitHub Actions (a just stopped `crunch` was
+still listed). Its `STOP` now waits the same way, and the `renice` check waits up to 2 s until the
+backup is gone or has nice 19. After the fix: `ONLY=practical-03` ALL PASS twice in a row.
+
 # Previous verification, 25 October 2026
 
 Extension of the lab with Practical 02 (Processes & threads) and a two-level navigation
