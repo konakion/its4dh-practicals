@@ -10,7 +10,7 @@ Public site: https://konakion.github.io/its4dh-practicals/
 |---|---|---|
 | Practical 01 | OS fundamentals: the Linux terminal | ready |
 | Practical 02 | Processes & threads | ready |
-| Practical 03 | IPC & scheduling | coming soon (placeholder) |
+| Practical 03 | IPC & scheduling | ready |
 | Practical 04 | Memory & isolation | coming soon (placeholder) |
 
 ## How it works
@@ -26,6 +26,7 @@ Public site: https://konakion.github.io/its4dh-practicals/
 | Files copied into the student's home folder | `docs/assets/fixtures/` (byte copies of `data/`) |
 | Page template and styles | `theme/main.html`, `docs/assets/practical.css` |
 | Codespaces lab of Practical 02 (checker, starter files) | `labs/practical-02/` |
+| One-page cheat sheets per session (HTML source and PDF) | `cheatsheet/` |
 
 The home page lists the sessions; each session is its own page with its own Linux system and its
 own progress (`localStorage` key `<id>-progress-v2`). Old Practical 01 links (`#/chapter/step` on
@@ -43,6 +44,16 @@ attempts, and feedback that explains the result.
   one step (`save`) are available to later steps (`ctx.saved('chapter/step')`) and to `chart()`.
 - *interleave*: a deterministic "you are the scheduler" exercise with two threads, a shared counter
   and an optional lock.
+
+**Charts.** `chart(saved, ctx)` returns `bars`, `timeline` or `gantt` (one row per job, several
+time slices per row, used for the schedules of Practical 03).
+
+**Practical 03** runs completely in the browser Linux: pipes and a named pipe, a local socket server
+(`station`, `echoserver`, built on socat), a real race condition between two `admit` processes and its
+fix with `flock`, a real deadlock between two `syncjob`s, and the Linux scheduler (`crunch`, `nice`,
+`renice`). Scheduling algorithms and the semaphore trace are calculated by hand (report steps). In the
+emulated Linux, CPU shares measured under different nice values are not reproducible, so the practical
+measures only equal shares and calculates the effect of nice from the kernel's weights.
 
 **Practical 02 in Codespaces.** `python3 p02.py check TASK` (in `labs/practical-02`) runs the
 student's program, measures it, inspects the code with `ast` and prints specific feedback. On
@@ -92,7 +103,8 @@ GitHub Pages and only runs when started manually.
    `id: 'its4dh-p03'`, `number`, `title`, `files`, `intro`, `chapters`, `summary` and `done`.
    Keep 2 to 4 short sentences per Learn text, an example that differs from the task, hints, a
    solution, and 2 to 3 quiz questions per chapter (one review question from chapter 2 on).
-   Example outputs of shell steps must come from the browser Linux.
+   Example outputs of shell steps must come from the browser Linux. An example that needs the
+   step's `setup` (for example a running server) gets `afterSetup: true`.
 2. **Files for the browser Linux** (if any): put the originals into `data/practical-03/`, byte
    copies into `docs/assets/fixtures/p03/`, list them in `files` (`readOnly`, `exec` as needed) and
    add the pairs to `scripts/check.py`.

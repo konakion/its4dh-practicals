@@ -768,6 +768,7 @@
   // spec: { type: 'bars', title, unit, bars: [{ label, value }] }
   //    or { type: 'timeline', title, unit, groups: [{ name, bars: [{ label, start, end }] }] }
   function drawChart(spec) {
+    if (spec.type === 'gantt') return drawGantt(spec);
     const W = 640, left = 150, right = 70, barH = 20, gap = 10, top = 8;
     const fmt = v => (Math.round(v * 100) / 100).toFixed(2) + ' ' + spec.unit;
     const fig = h('figure', { class: 'chart' }, h('figcaption', { text: spec.title }));
@@ -793,6 +794,31 @@
     }
     fig.append(svg);
     if (spec.note) fig.append(h('p', { class: 'chart-note' }, rich(spec.note)));
+    return fig;
+  }
+
+  // Gantt chart for schedules worked out by hand: one row per job, several slices per row.
+  // spec: { type: 'gantt', title, unit, tick, rows: [{ label, segs: [{ label, start, end }] }], note }
+  function drawGantt(spec) {
+    const W = 640, left = 150, right = 20, barH = 24, gap = 8, top = 8;
+    const fig = h('figure', { class: 'chart gantt' }, h('figcaption', { text: spec.title }));
+    const max = spec.max || Math.max(...spec.rows.flatMap(r => r.segs.map(g => g.end)), 1);
+    const H = top + spec.rows.length * (barH + gap) + 26;
+    const x = v => left + (W - left - right) * v / max;
+    const desc = spec.rows.map(r => `${r.label}: ${r.segs.map(g => `${g.start} to ${g.end} ${spec.unit}`).join(', ')}`).join('; ');
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': spec.title + '. ' + desc });
+    for (let t = 0; t <= max + 1e-9; t += spec.tick || 1) {
+      svg.append(s('line', { x1: x(t), x2: x(t), y1: top, y2: H - 22, class: 'grid' }), s('text', { x: x(t), y: H - 6, class: 'tick', 'text-anchor': 'middle' }, String(Math.round(t * 10) / 10)));
+    }
+    spec.rows.forEach((r, i) => {
+      const y = top + i * (barH + gap);
+      svg.append(s('text', { x: left - 10, y: y + barH / 2 + 5, class: 'label', 'text-anchor': 'end' }, r.label));
+      for (const g of r.segs) {
+        svg.append(s('rect', { x: x(g.start), y, width: Math.max(2, x(g.end) - x(g.start)), height: barH, rx: 3, class: 'bar k' + (i % 4) }, s('title', {}, `${r.label}: ${g.start} to ${g.end} ${spec.unit}`)));
+        if (x(g.end) - x(g.start) >= 14) svg.append(s('text', { x: (x(g.start) + x(g.end)) / 2, y: y + barH / 2 + 5, class: 'seg', 'text-anchor': 'middle' }, g.label));
+      }
+    });
+    fig.append(svg, h('p', { class: 'chart-note' }, rich(`Time in ${spec.unit}. ` + (spec.note || ''))));
     return fig;
   }
 

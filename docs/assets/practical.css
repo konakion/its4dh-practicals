@@ -366,6 +366,10 @@ textarea.paste:focus, input.short:focus, .field select:focus { outline: 3px soli
 .chart .value { fill: var(--ink); font-size: 13px; font-variant-numeric: tabular-nums; }
 .chart .bar { fill: var(--accent); }
 .chart rect:hover { fill: var(--accent-hover); }
+.chart.gantt .bar.k1 { fill: var(--ok); }
+.chart.gantt .bar.k2 { fill: var(--warn); }
+.chart.gantt .bar.k3 { fill: #6b4fa0; }
+.chart .seg { fill: #fff; font-size: 12px; font-weight: 700; pointer-events: none; }
 .chart-note { font-size: 0.92rem; color: var(--muted); margin: 0.4rem 0 0.2rem; }
 .recap { padding-left: 1.2rem; }
 .recap li { margin-bottom: 0.45rem; }

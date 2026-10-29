@@ -17,4 +17,5 @@ nav:
   - Practical lab: index.md
   - "Practical 01: OS fundamentals": practical-01.md
   - "Practical 02: Processes & threads": practical-02.md
+  - "Practical 03: IPC & scheduling": practical-03.md
   - About: about.md

@@ -1,0 +1,26 @@
+#!/bin/sh
+# admit: admits patients by adding 1 to a shared counter file (ITS4DH practical, synthetic).
+#
+#   admit NAME COUNT [--lock]      for example: admit ward-a 10
+#
+# Every admission reads ~/ward/admitted, pauses a moment, and writes the new value back.
+# Two admits at the same time can therefore lose updates (a race condition).
+# With --lock, read and write happen while holding ~/ward/admitted.lock (flock).
+name=${1:-ward}
+count=${2:-10}
+f=$HOME/ward/admitted
+mkdir -p "$HOME/ward"
+[ -f "$f" ] || echo 0 > "$f"
+exec </dev/null
+i=0
+while [ "$i" -lt "$count" ]; do
+  if [ "$3" = "--lock" ]; then
+    exec 9>>"$f.lock"; flock 9
+  fi
+  n=$(cat "$f")
+  usleep 20000                     # a short pause between read and write
+  echo $((n + 1)) > "$f"
+  [ "$3" = "--lock" ] && flock -u 9
+  i=$((i + 1))
+done
+echo "$name admitted $count patients"

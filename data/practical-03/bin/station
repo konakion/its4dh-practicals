@@ -1,0 +1,12 @@
+#!/bin/sh
+# station: the nurse station, a small server on a local (Unix domain) socket.
+# ITS4DH practical, synthetic.
+#
+#   station SOCKET                 for example: station ~/ipc/station.sock
+#
+# Every line a client sends is stored in ~/ipc/inbox.log and answered with "ACK ...".
+sock=${1:-$HOME/ipc/station.sock}
+mkdir -p "$HOME/ipc"
+rm -f "$sock"
+exec </dev/null >/dev/null 2>&1
+exec socat UNIX-LISTEN:"$sock",fork SYSTEM:'read line; echo "$line" >> "$HOME/ipc/inbox.log"; echo "ACK nurse station received: $line"'

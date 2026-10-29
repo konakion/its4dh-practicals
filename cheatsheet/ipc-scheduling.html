@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IPC & scheduling cheat sheet</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --red: #b1063a; --ink: #24313f; --muted: #5d6874; --line: #d9dde1; --soft: #fbf1f4; --code: #f3f4f6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { width: 210mm; height: 297mm; font: 7.5pt/1.33 'DejaVu Sans', Verdana, sans-serif; color: var(--ink); position: relative; overflow: hidden; }
+  .bar { height: 3.2mm; background: var(--red); }
+  .page { padding: 7mm 13mm 0; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .course { font-weight: bold; font-size: 9.6pt; line-height: 1.4; color: #4a5561; margin-top: 2mm; }
+  .logo { width: 43mm; margin-top: 0.5mm; }
+  h1 { font-size: 22pt; line-height: 1.1; margin: 3mm 0 1.2mm; letter-spacing: -0.2pt; }
+  .sub { color: var(--muted); margin: 0 0 3mm; padding-bottom: 2.6mm; border-bottom: 0.6pt solid var(--line); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  h2 { font-size: 10.2pt; margin: 2.2mm 0 1.4mm; padding-bottom: 1.3mm; border-bottom: 0.6pt solid var(--line); }
+  h2 .n { color: var(--red); margin-right: 1.6mm; }
+  h3 { font: bold 8.6pt 'DejaVu Sans Mono', Menlo, monospace; color: var(--red); margin: 1.6mm 0 0.3mm; }
+  p { margin: 0 0 0.6mm; }
+  code, pre, .mono { font-family: 'DejaVu Sans Mono', Menlo, monospace; font-size: 7.2pt; }
+  .cmd { margin: 0.2mm 0 0.5mm; white-space: pre; line-height: 1.38; }
+  .cmd .c { color: #7a8591; }
+  .note { font-size: 6.6pt; color: var(--muted); margin: 0.2mm 0 0.6mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 1.2mm; font-size: 7.1pt; }
+  th { text-align: left; font-weight: bold; color: var(--muted); font-size: 6.8pt; border-bottom: 0.6pt solid var(--line); padding: 0.6mm 1mm 0.8mm 0; }
+  td { padding: 0.8mm 1mm 0.8mm 0; border-bottom: 0.4pt solid #eceef0; vertical-align: top; }
+  td:first-child { font-weight: bold; white-space: nowrap; }
+  .box { background: var(--soft); border-radius: 1.6mm; padding: 2mm 2.8mm 2.2mm; margin: 1.6mm 0 0.5mm; }
+  .box h4 { margin: 0 0 0.8mm; color: var(--red); font-size: 8.2pt; }
+  .box p { color: #4a5561; font-size: 7.2pt; }
+  .formula { font-weight: bold; }
+  .gantt { margin: 0.8mm 0 0.4mm; }
+  .gantt .row { display: flex; align-items: center; margin: 0.5mm 0; }
+  .gantt .lab { width: 13mm; font-weight: bold; font-size: 6.8pt; }
+  .gantt .track { display: flex; width: 64mm; }
+  .gantt .s { height: 3.6mm; color: #fff; font: bold 6.2pt/3.6mm 'DejaVu Sans', sans-serif; text-align: center; border-right: 0.4mm solid #fff; }
+  .gantt .L { background: #2547a8; } .gantt .A { background: #b1063a; } .gantt .D { background: #17724b; } .gantt .B { background: #8f5100; }
+  .gantt .res { font-size: 6.6pt; color: var(--muted); margin-left: 2mm; white-space: nowrap; }
+  .axis { display: flex; width: 64mm; margin-left: 13mm; font-size: 5.8pt; color: var(--muted); justify-content: space-between; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 7mm; display: flex; justify-content: space-between; font-size: 6.7pt; color: var(--muted); border-top: 0.6pt solid var(--line); padding-top: 1.6mm; }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<div class="page">
+  <header>
+    <div class="course">Introduction to IT Systems<br>for Digital Health Experts</div>
+    <img class="logo" src="hpi-logo.png" alt="Hasso Plattner Institut">
+  </header>
+  <h1>IPC &amp; scheduling cheat sheet</h1>
+  <p class="sub">Practical 03 | Everything runs in the browser Linux; chapter 5 and the last step of chapter 6 are worked out on paper.</p>
+
+  <div class="cols">
+    <div>
+      <h2><span class="n">01</span>Pipes</h2>
+      <h3>A | B</h3>
+      <p>Every command is its own process; the pipe carries the output of A to the input of B.</p>
+      <div class="cmd mono">grep ALARM logs/vitals.log | cut -d' ' -f2 | sort -u</div>
+      <p class="note">cut -d' ' -f2: second column &middot; sort -u: sort and drop duplicates.</p>
+      <h3>mkfifo</h3>
+      <p>A named pipe: a pipe with a name, usable by any two processes. <code>ls -l</code> shows a <code>p</code>.</p>
+      <div class="cmd mono">mkfifo ~/ipc/alarms
+echo 'bed-07 ALARM' &gt; ~/ipc/alarms &amp;   <span class="c">writer in the background</span>
+cat ~/ipc/alarms                    <span class="c">reader</span></div>
+      <p class="note">A writer waits until a reader opens the pipe. Without &amp; the shell waits forever.</p>
+
+      <h2><span class="n">02</span>Sockets</h2>
+      <p>Two-way connection: the client sends a request, the server answers. Local: a Unix domain socket file; across machines: a network address and port.</p>
+      <div class="cmd mono">echo "bed-12 spo2=86 ALARM" | socat - UNIX-CONNECT:ipc/station.sock
+netstat -lx                         <span class="c">who is listening (Unix sockets)</span></div>
+      <table>
+        <tr><th>Mechanism</th><th>Direction</th><th>Reach</th><th>Typical use</th></tr>
+        <tr><td>pipe <span class="mono">|</span></td><td>one way</td><td>one machine</td><td>chain commands</td></tr>
+        <tr><td>named pipe</td><td>one way</td><td>one machine</td><td>two unrelated programs</td></tr>
+        <tr><td>message queue</td><td>many → many</td><td>one machine*</td><td>jobs, events</td></tr>
+        <tr><td>shared memory</td><td>all share</td><td>one machine</td><td>large data, fastest</td></tr>
+        <tr><td>socket</td><td>two way</td><td>local or network</td><td>servers, web, APIs</td></tr>
+      </table>
+      <p class="note">* brokers such as MQTT extend queues across the network.</p>
+
+      <h2><span class="n">03</span>Shared data, locks, semaphores</h2>
+      <p>Read, change, write: two processes that both read the same old value lose an update (race condition).</p>
+      <div class="cmd mono">admit ward-a 10 &amp; admit ward-b 10 &amp;   <span class="c">at the same time</span>
+wait                                <span class="c">wait for all background jobs</span>
+cat ~/ward/admitted                 <span class="c">less than 20!</span></div>
+      <p><b>Lock</b> (mutual exclusion): only one at a time in the critical section. <code>flock FILE</code> is the Linux tool. A lock only helps if <b>every</b> process uses it.</p>
+      <div class="box">
+        <h4>Semaphore S = number of free units</h4>
+        <p><b>P(S)</b>: S &gt; 0 → S − 1 and continue, otherwise wait.<br><b>V(S)</b>: someone waits → hand the unit over (S stays), otherwise S + 1.<br>S = 1 works like a lock, S = N lets up to N in. S never goes below 0.</p>
+      </div>
+    </div>
+
+    <div>
+      <h2><span class="n">04</span>Deadlock</h2>
+      <p>Each job holds one lock and waits for the other: nobody ever continues. The jobs still exist, they just make no progress.</p>
+      <table>
+        <tr><th>Condition</th><th>Meaning</th></tr>
+        <tr><td>mutual exclusion</td><td>a resource is used by one at a time</td></tr>
+        <tr><td>hold and wait</td><td>hold one resource, wait for another</td></tr>
+        <tr><td>no preemption</td><td>nobody takes a resource away</td></tr>
+        <tr><td>circular wait</td><td>a circle of waiting jobs</td></tr>
+      </table>
+      <p><span class="formula">All four needed, break one.</span> Easiest: every job takes the locks in the <b>same order</b>.</p>
+      <div class="cmd mono">killall syncjob                     <span class="c">stop the stuck jobs politely</span></div>
+
+      <h2><span class="n">05</span>Scheduling by hand</h2>
+      <table>
+        <tr><th>Metric</th><th>Meaning</th></tr>
+        <tr><td>waiting time</td><td>ready but not running (no I/O: start time − arrival)</td></tr>
+        <tr><td>turnaround</td><td>finish − arrival</td></tr>
+        <tr><td>response time</td><td>first run − arrival</td></tr>
+      </table>
+      <p>Ward jobs, all ready at 0: L 7, A 1, D 3, B 5 ms.</p>
+      <div class="gantt">
+        <div class="row"><span class="lab">FCFS</span><span class="track"><span class="s L" style="width:28mm">L</span><span class="s A" style="width:4mm">A</span><span class="s D" style="width:12mm">D</span><span class="s B" style="width:20mm">B</span></span><span class="res">avg wait 6.5</span></div>
+        <div class="row"><span class="lab">SJF</span><span class="track"><span class="s A" style="width:4mm">A</span><span class="s D" style="width:12mm">D</span><span class="s B" style="width:20mm">B</span><span class="s L" style="width:28mm">L</span></span><span class="res">avg wait 3.5</span></div>
+        <div class="row"><span class="lab">RR q=2</span><span class="track"><span class="s L" style="width:8mm">L</span><span class="s A" style="width:4mm">A</span><span class="s D" style="width:8mm">D</span><span class="s B" style="width:8mm">B</span><span class="s L" style="width:8mm">L</span><span class="s D" style="width:4mm">D</span><span class="s B" style="width:8mm">B</span><span class="s L" style="width:8mm">L</span><span class="s B" style="width:4mm">B</span><span class="s L" style="width:4mm">L</span></span><span class="res">avg resp. 2.5</span></div>
+        <div class="axis"><span>0</span><span>4</span><span>8</span><span>12</span><span>16 ms</span></div>
+      </div>
+      <table>
+        <tr><th>Algorithm</th><th>Idea</th><th>Strength</th><th>Weakness</th></tr>
+        <tr><td>FCFS</td><td>arrival order</td><td>simple, fair</td><td>convoy effect</td></tr>
+        <tr><td>SJF</td><td>shortest next</td><td>min. average wait</td><td>needs burst lengths, starvation</td></tr>
+        <tr><td>Round Robin</td><td>quantum q, then back</td><td>quick first turn</td><td>many context switches</td></tr>
+        <tr><td>Priority</td><td>most important first</td><td>urgent work first</td><td>starvation without aging</td></tr>
+      </table>
+
+      <h2><span class="n">06</span>Scheduling in Linux</h2>
+      <p>Fair shares by weight. nice −20 … 19: higher = nicer = smaller share. Users may only make processes nicer.</p>
+      <div class="cmd mono">crunch a 3 &amp; crunch b 3 &amp; wait        <span class="c">two jobs share one core</span>
+nice -n 10 COMMAND                  <span class="c">start with nice 10</span>
+renice -n 19 -p PID                 <span class="c">change a running process</span></div>
+      <p><span class="formula">Share = weight ÷ sum of all weights.</span> Weights: nice 0 = 1024, 5 = 335, 10 = 110, 19 = 15. Example: 335 ÷ (1024 + 335) ≈ 24.7 %.</p>
+    </div>
+  </div>
+</div>
+<footer><span>ITS4DH &nbsp;/&nbsp; IPC &amp; scheduling &nbsp;/&nbsp; Orhan Konak</span><span>konakion.github.io/its4dh-practicals &nbsp;&nbsp; 1 / 1</span></footer>
+</body>
+</html>

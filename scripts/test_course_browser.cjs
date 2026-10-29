@@ -95,12 +95,15 @@ const ok = (msg) => { passed++; console.log('PASS', msg); };
     for (const ch of C.chapters) for (const st of ch.steps) {
       if (st.mode) continue;
       const ex = st.example;
-      const r = await page.evaluate(async ({ start, cmd }) => {
+      // fresh files and the step's start folder; examples marked afterSetup also need the step's
+      // setup first (for example a server that the example talks to), as on the page
+      const r = await page.evaluate(async ({ start, setup, cmd }) => {
         const L = window.practicalLinux;
         await L.reset();
         if (start) await L.exec('cd ' + start.replace(/^~/, '"$HOME"'));
+        if (setup) await L.exec(setup);
         return L.exec(cmd);
-      }, { start: ex.start || st.start, cmd: ex.cmd });
+      }, { start: ex.start || st.start, setup: ex.afterSetup ? st.setup : null, cmd: ex.cmd });
       assert.equal(r.stderr, '', `${ch.id}/${st.id} example stderr`);
       assert.equal(mask(ex, norm(r.stdout)), mask(ex, norm(ex.out)), `${ch.id}/${st.id} example output`);
     }

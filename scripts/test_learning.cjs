@@ -301,4 +301,45 @@ if (READY.some(s => s.slug === 'practical-02')) {
   }
   console.log(`PASS 4b practical-02: ${answers} answers through the page's verify() (real result codes, wrong answers explained), ${examples} Python examples print exactly what the page shows`);
 }
+// ---------------------------------------------------------------- 5. Practical 03: answers worked out by hand
+if (READY.some(s => s.slug === 'practical-03')) {
+  const CASES = require('./cases/practical-03.cjs');
+  const window = load('practical-03');
+  const { parseResult, parseNumber } = window.ITS4DH;
+  const C = window.PRACTICAL;
+  const ctx = { saved: id => (CASES.saved || {})[id] || null, parse: parseResult, number: parseNumber };
+  let answers = 0, charts = 0;
+  for (const ch of C.chapters) for (const st of ch.steps) {
+    if (st.mode !== 'report') continue;
+    const id = `${ch.id}/${st.id}`, cases = CASES[id];
+    for (const [v, re] of cases.wrong) {
+      const r = st.verify(v, ctx);
+      assert(!r.ok, `${id}: wrong answer accepted: ${JSON.stringify(v)}`);
+      assert.match(r.msg, re, `${id}: feedback for ${JSON.stringify(v)}`);
+      answers++;
+    }
+    for (const v of cases.alts.concat([cases.model])) {
+      const r = st.verify(v, ctx);
+      assert(r.ok, `${id}: correct answer rejected: ${JSON.stringify(v)}: ${r.msg}`);
+      answers++;
+    }
+    if (st.chart) {
+      const spec = st.chart(st.verify(cases.model, ctx).save, ctx);
+      assert(spec, `${id}: chart`);
+      if (spec.type === 'gantt') {
+        // the chart shows a complete schedule: every job runs exactly its CPU burst, without overlaps
+        const segs = spec.rows.flatMap(r => r.segs).sort((a, b) => a.start - b.start);
+        segs.forEach((g, i) => i && assert(g.start >= segs[i - 1].end, `${id}: no two jobs at the same time`));
+        assert.equal(segs.reduce((n, g) => n + g.end - g.start, 0), 16, `${id}: 16 ms of work in total`);
+      }
+      charts++;
+    }
+  }
+  // the model solutions shown on the page match the recomputed schedules
+  const sch = C.chapters.find(c => c.id === 'schedule');
+  assert.match(sch.steps[0].solution, /average = 26 ÷ 4 = 6\.5 ms/);
+  assert.match(sch.steps[1].solution, /average = 14 ÷ 4 = 3\.5 ms/);
+  assert.match(sch.steps[2].solution, /L finishes at 16 ms/);
+  console.log(`PASS 5 practical-03: ${answers} hand-calculated answers through the page's verify() (wrong answers explained), ${charts} charts drawn from the correct schedules`);
+}
 console.log('PASS: all learning tests');

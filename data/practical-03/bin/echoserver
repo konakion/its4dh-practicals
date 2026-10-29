@@ -1,0 +1,9 @@
+#!/bin/sh
+# echoserver: answers every line with the same line in capital letters (ITS4DH practical).
+#
+#   echoserver SOCKET              for example: echoserver ~/ipc/echo.sock
+sock=${1:-$HOME/ipc/echo.sock}
+mkdir -p "$(dirname "$sock")"
+rm -f "$sock"
+exec </dev/null >/dev/null 2>&1
+exec socat UNIX-LISTEN:"$sock",fork SYSTEM:'read line; echo "$line" | tr a-z A-Z'

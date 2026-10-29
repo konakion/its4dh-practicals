@@ -24,6 +24,12 @@ pairs = {
     'data/practical-02/bin/monitor': 'docs/assets/fixtures/p02/monitor',
     'data/practical-02/bin/analyse': 'docs/assets/fixtures/p02/analyse',
     'data/practical-02/notes/handover.txt': 'docs/assets/fixtures/p02/handover.txt',
+    'data/practical-03/logs/vitals.log': 'docs/assets/fixtures/p03/vitals.log',
+    'data/practical-03/bin/admit': 'docs/assets/fixtures/p03/admit',
+    'data/practical-03/bin/syncjob': 'docs/assets/fixtures/p03/syncjob',
+    'data/practical-03/bin/crunch': 'docs/assets/fixtures/p03/crunch',
+    'data/practical-03/bin/station': 'docs/assets/fixtures/p03/station',
+    'data/practical-03/bin/echoserver': 'docs/assets/fixtures/p03/echoserver',
 }
 for source, copy in pairs.items():
     assert sha(ROOT / source) == sha(ROOT / copy), f'{copy} differs from {source}'

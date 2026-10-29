@@ -1,4 +1,36 @@
-# Verification, 25 October 2026
+# Verification, 29 October 2026
+
+Extension of the lab with Practical 03 (IPC & scheduling): 6 chapters, 15 exercises (10 in the
+browser Linux, 5 calculated by hand), 6 quizzes, cheat sheet. Practicals 01 and 02 are unchanged.
+Engine change: a `gantt` chart type for hand-calculated schedules. Browser test change: examples
+marked `afterSetup` run after the step's setup (Practical 03 only).
+
+## Practical 03, automated results
+
+| Check | Result |
+|---|---|
+| `python3 scripts/check.py` | PASS: Practical 03 programs and `vitals.log` byte-identical in `data/practical-03` and `docs/assets/fixtures/p03`; three ready sessions |
+| `node scripts/test_learning.cjs` | PASS (all sections, with the Practical 02 lab checker): structure of 3 sessions; Practical 03: 6 chapters, 15 exercises, Learn texts within 25 to 85 words, 35 hand-calculated answers through the page's `verify()` with the expected feedback, Gantt charts complete and without overlaps (16 ms of work) |
+| `mkdocs build --strict`, `scripts/check_site.py` | PASS: 5 pages, 33 local links and assets under `/its4dh-practicals/` |
+| `ONLY=practical-03 node scripts/test_course_browser.cjs` | ALL PASS, 28 checks: 10 example outputs reproduced in the browser Linux; 10 shell exercises with 26 wrong, 18 alternative and all model solutions (pipes, named pipe incl. a blocking writer, Unix domain socket server, `netstat -lx`, a real lost update between two processes, the `flock` fix, a real deadlock and its fix by lock order, two CPU-bound jobs sharing one core, `renice`); 5 report steps with 23 wrong and 12 correct answers and their charts; 6 quizzes; progress, completion page, 390/768 px layout, keyboard, Restart Linux |
+| Mutation check | A wrong FCFS schedule in `practical-03.js` fails test_learning |
+
+Measured in the browser Linux while designing: two concurrent `admit ward-a 10` / `ward-b 10` end
+at 11 to 13 instead of 20 (with `--lock`: 20, about 2 s); two concurrent `crunch` jobs get nearly
+equal rounds (26/25, 164/162, 131/130). Rounds under different nice values were **not**
+reproducible in the emulator (nice 19 sometimes got more rounds), so Practical 03 does not measure
+them and calculates shares from the kernel weights instead.
+
+## Practical 02 in this run
+
+The full browser test failed twice in Practical 02, at different, timing-dependent places
+(`bonus/state`: no monitor PID yet; `manage/2`: monitors of the previous step still running right
+after Reset). Practical 02 files were not changed. The **unchanged** repository (commit 4ca8beb)
+fails the same way in this container (`manage/2`: 2 monitors still running), so this is an existing
+timing sensitivity of the Practical 02 browser test, not a regression. Worth a look before the next
+CI run: give the monitor setup a short settle loop, as Practical 03 does for its programs.
+
+# Previous verification, 25 October 2026
 
 Extension of the lab with Practical 02 (Processes & threads) and a two-level navigation
 (session overview, chapters per session). Practical 01 content is unchanged; it moved from the

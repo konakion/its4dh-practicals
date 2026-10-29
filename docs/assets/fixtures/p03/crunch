@@ -1,0 +1,26 @@
+#!/bin/sh
+# crunch: a CPU-bound job that counts rounds for some seconds (ITS4DH practical, synthetic).
+#
+#   crunch NAME [SECONDS]          for example: crunch report 3
+#
+# It never waits, it only counts. At the end it prints how many rounds it managed
+# and its nice value, and writes the same line to ~/sched/NAME.txt.
+name=${1:-job}; seconds=${2:-3}
+mkdir -p "$HOME/sched"
+exec </dev/null
+read up rest < /proc/uptime               # the clock: seconds since boot, read without a new process
+start=${up%.*}
+echo "$start" > "$HOME/sched/.$name.start"   # for the exercise checker
+end=$((start + seconds))
+rounds=0
+now=$start
+while [ "$now" -lt "$end" ]; do
+  i=0
+  while [ "$i" -lt 100 ]; do i=$((i + 1)); done
+  rounds=$((rounds + 1))
+  read up rest < /proc/uptime
+  now=${up%.*}
+done
+line="$name: $rounds rounds (nice $(nice))"
+echo "$line" > "$HOME/sched/$name.txt"
+echo "$line"

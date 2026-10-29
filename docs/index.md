@@ -10,5 +10,6 @@ description: Interactive hands-on practicals for IT Systems for Digital Health E
 <ul>
 <li><a href="practical-01/">Practical 01: OS fundamentals</a></li>
 <li><a href="practical-02/">Practical 02: Processes &amp; threads</a></li>
+<li><a href="practical-03/">Practical 03: IPC &amp; scheduling</a></li>
 </ul>
 </div>

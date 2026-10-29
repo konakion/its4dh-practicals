@@ -1,0 +1,26 @@
+#!/bin/sh
+# syncjob: a job that needs two locks, one after the other (ITS4DH practical, synthetic).
+#
+#   syncjob NAME FIRST SECOND      for example: syncjob billing records alarms
+#
+# It takes the lock FIRST, works for one second, then takes the lock SECOND.
+# Each step is written to ~/ward/sync.log. A job that waits longer than 20 seconds gives up,
+# so a forgotten deadlock never lasts long.
+name=${1:-job}; first=${2:-records}; second=${3:-alarms}
+dir=$HOME/ward; log=$dir/sync.log; locks=$dir/locks
+mkdir -p "$locks"
+exec </dev/null >/dev/null 2>&1
+exec 7>>"$locks/$first"
+flock 7
+echo "$name: has $first" >> "$log"
+sleep 1
+echo "$name: waits for $second" >> "$log"
+exec 8>>"$locks/$second"
+i=0
+until flock -n 8; do                     # try again every 0.2 s, give up after 20 s
+  sleep 0.2
+  i=$((i + 1))
+  if [ "$i" -ge 100 ]; then echo "$name: gave up after 20 s" >> "$log"; exit 1; fi
+done
+echo "$name: has $second" >> "$log"
+echo "$name: done" >> "$log"
