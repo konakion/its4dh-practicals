@@ -40,7 +40,10 @@
     'settle(){ i=0; while alive $1 && [ $i -lt 5 ]; do sleep 0.1; i=$((i+1)); done; }; ';
   // Every exercise starts by stopping the course programs of earlier steps: politely first,
   // then by force (a frozen monitor ignores SIGTERM). Only the student's own processes exist here.
-  const STOP_ALL = 'killall -q monitor; killall -q analyse; sleep 0.2; killall -q -9 monitor; rm -f ~/ward/*.pid';
+  // Killed processes can stay visible for a moment (as zombies, until init collects them), and
+  // pidof would still list them: wait until they are really gone, at most 3 seconds.
+  const STOP_ALL = 'killall -q monitor; killall -q analyse; sleep 0.2; killall -q -9 monitor; killall -q -9 analyse; rm -f ~/ward/*.pid; ' +
+    'i=0; while { pidof monitor || pidof analyse; } >/dev/null && [ $i -lt 30 ]; do sleep 0.1; i=$((i+1)); done';
   const startMonitors = beds => beds.map(b => `monitor ${b} &`).join(' ') + ' i=0; while [ $i -lt 20 ]; do n=0; for b in ' + beds.join(' ') + '; do [ -f ~/ward/$b.pid ] && n=$((n+1)); done; [ $n = ' + beds.length + ' ] && break; sleep 0.1; i=$((i+1)); done';
 
 window.PRACTICAL = {

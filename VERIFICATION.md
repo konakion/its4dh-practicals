@@ -21,14 +21,15 @@ equal rounds (26/25, 164/162, 131/130). Rounds under different nice values were 
 reproducible in the emulator (nice 19 sometimes got more rounds), so Practical 03 does not measure
 them and calculates shares from the kernel weights instead.
 
-## Practical 02 in this run
+## Practical 02: timing fix
 
-The full browser test failed twice in Practical 02, at different, timing-dependent places
-(`bonus/state`: no monitor PID yet; `manage/2`: monitors of the previous step still running right
-after Reset). Practical 02 files were not changed. The **unchanged** repository (commit 4ca8beb)
-fails the same way in this container (`manage/2`: 2 monitors still running), so this is an existing
-timing sensitivity of the Practical 02 browser test, not a regression. Worth a look before the next
-CI run: give the monitor setup a short settle loop, as Practical 03 does for its programs.
+The browser test of Practical 02 failed now and then at `bonus/state` (two PIDs from `pidof monitor`)
+or `manage/2` (monitors of the previous step still listed right after Reset), also in the unchanged
+repository and on GitHub Actions. Cause: a monitor that was just stopped stays visible for a few
+tenths of a second until init collects it, and `pidof` still lists it. `STOP_ALL` in
+`practical-02.js` now waits until no `monitor` or `analyse` is listed any more (at most 3 s).
+After the fix: `ONLY=practical-02` browser test ALL PASS twice in a row (44 checks each), and the
+full browser test of all three sessions passes: ALL PASS, 108 checks.
 
 # Previous verification, 25 October 2026
 
