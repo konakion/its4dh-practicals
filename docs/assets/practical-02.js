@@ -1017,7 +1017,7 @@ window.PRACTICAL = {
             'For every process, Linux offers a folder `/proc/PID` with files that describe it. They are not real files on disk: the kernel creates their contents when you read them. `ps` and `top` read their information from here.',
             '`/proc/PID/status` lists, for example, the name, the state, the parent and the number of **threads**.',
           ],
-          example: { cmd: "grep -E '^(Name|PPid)' /proc/$$/status", out: 'Name:\tsh\nPPid:\t35', note: 'Your shell is called sh, and its parent has the PID 35.' },
+          example: { cmd: "grep -E '^(Name|PPid)' /proc/$$/status", out: 'Name:\tsh\nPPid:\t35', note: 'Your shell is called sh, and its parent has the PID 35 here. The number may differ on your screen: PIDs depend on how the system started.', volatile: 'numbers' },
           task: 'How many **threads** does your shell have? Print the Threads line of your shell’s status file.',
           check: { output: 'lines', expect: 'grep Threads /proc/$$/status' },
           hints: ['`$$` is the PID of your shell, so its folder is `/proc/$$`.', 'Search the status file for the word Threads with grep.'],

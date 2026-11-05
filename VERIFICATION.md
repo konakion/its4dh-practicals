@@ -8,6 +8,13 @@ measurement, for page faults that vary by a few from run to run) and an optional
 charts (default 2 decimals as before). Browser test change: the "Coming soon" check only runs when
 a session is still marked as coming soon (all four are ready now).
 
+## Practical 02: example fix
+
+On GitHub Actions the browser test failed at the Practical 02 example `bonus/status`: the parent PID
+of the student's shell was 36 instead of 35. PIDs depend on how the emulated system boots, so this
+example is now marked `volatile: 'numbers'` (numbers masked, text compared) and its note says that
+the number may differ. After the fix: `ONLY=practical-02` ALL PASS, 44 checks.
+
 ## Practical 04, automated results
 
 | Check | Result |
