@@ -18,7 +18,7 @@ window.ITS4DH_LAB = {
       subtitle: 'Run, inspect and stop processes. Make waiting programs faster with threads, and keep shared data safe.', pillar: 'Pillar 1: Operating systems', minutes: 90, status: 'ready' },
     { id: 'its4dh-p03', slug: 'practical-03', number: 'Practical 03', title: 'IPC & scheduling', navTitle: 'IPC & scheduling',
       subtitle: 'Let processes talk through pipes and sockets, cause and fix a race and a deadlock, and be the scheduler.', pillar: 'Pillar 1: Operating systems', minutes: 90, status: 'ready' },
-    { id: 'its4dh-p04', slug: 'practical-04', number: 'Practical 04', title: 'Memory & isolation',
-      subtitle: 'Virtual memory, permissions and containers.', pillar: 'Pillar 1: Operating systems', minutes: 90, status: 'soon' },
+    { id: 'its4dh-p04', slug: 'practical-04', number: 'Practical 04', title: 'Memory & file systems', navTitle: 'Memory & file systems',
+      subtitle: 'Look inside the address space of a process, watch pages load on demand, cause an out-of-memory kill, and solve a full disk that still has free space.', pillar: 'Pillar 1: Operating systems', minutes: 90, status: 'ready' },
   ],
 };

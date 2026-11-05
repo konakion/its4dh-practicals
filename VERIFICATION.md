@@ -1,4 +1,36 @@
-# Verification, 29 October 2026
+# Verification, 5 November 2026
+
+Extension of the lab with Practical 04 (Memory & file systems), matching Lecture 4: 8 chapters,
+21 exercises (16 in the browser Linux, 5 calculated by hand), 8 quizzes, cheat sheet
+(`cheatsheet/memory-filesystems.html` and PDF). Practicals 01 to 03 are unchanged.
+Engine changes: a check mode `numbers` (same numbers within `check.tol` of Linux's own
+measurement, for page faults that vary by a few from run to run) and an optional `digits` for bar
+charts (default 2 decimals as before). Browser test change: the "Coming soon" check only runs when
+a session is still marked as coming soon (all four are ready now).
+
+## Practical 04, automated results
+
+| Check | Result |
+|---|---|
+| `python3 scripts/check.py` | PASS: `cache`, `ward.log` and `handover.txt` byte-identical in `data/practical-04` and `docs/assets/fixtures/p04`; four ready sessions |
+| `node scripts/test_learning.cjs` (as a normal user) | PASS, all sections: new unit tests for `numbers`; structure of 4 sessions; Practical 04: 8 chapters, 21 exercises, Learn texts within 25 to 85 words, 32 hand-calculated answers through the page's `verify()` with the expected feedback, 3 charts; FIFO 9 and 10 misses (Belady) and LRU 8 misses recomputed by an independent simulation; address 30000 → 9520 |
+| `mkdocs build --strict`, `scripts/check_site.py` | PASS: 6 pages, 40 local links and assets under `/its4dh-practicals/` |
+| `ONLY=practical-04 node scripts/test_course_browser.cjs` | ALL PASS, 34 checks, three runs in a row: 16 example outputs reproduced in the browser Linux; 16 shell exercises with 48 wrong, 33 alternative and all model solutions; 5 report steps with 21 wrong and 11 correct answers and 3 charts; 8 quizzes; progress, completion page, 390/768 px layout, keyboard, Restart Linux |
+| Full browser test, all four sessions | ALL PASS, 137 checks |
+| `ONLY=practical-03` after the chart change | ALL PASS, 28 checks |
+| Mutation check | A wrong physical address in `practical-04.js` fails test_learning |
+
+Measured in the browser Linux while designing (Linux 6.8, BusyBox, 64 MB emulated, 39 MB usable):
+`free -m` total 39 MB, SwapTotal 0 kB; every stack region is 0x21000 bytes = 33 pages, at a random
+address in each process; `dd bs=8M count=0` causes 39 to 41 minor page faults, `count=1` 2087 to
+2090 (+2048 pages = 8 MB ÷ 4 kB); `cache 8` has an RSS of about 9100 kB; `cache 25` and `cache 30`
+are stopped by the OOM killer and logged in `dmesg`, the shell and the session keep running; the
+home file system (rootfs, `nr_inodes=4170`) refuses new files after about 3700 empty files with
+*No space left on device* while `/tmp` still has free space; a 2-byte file occupies 4 kB.
+BusyBox has no `stat`, `df -i`, `getconf` or `vmstat`, so the practical uses `ls -i`, `mount`,
+`/usr/bin/time -v` and `/proc` instead.
+
+# Previous verification, 29 October 2026
 
 Extension of the lab with Practical 03 (IPC & scheduling): 6 chapters, 15 exercises (10 in the
 browser Linux, 5 calculated by hand), 6 quizzes, cheat sheet. Practicals 01 and 02 are unchanged.

@@ -1,0 +1,10 @@
+2026-11-04 22:00 bed-01 shift start, 6 patients on the ward
+2026-11-04 22:15 bed-03 heart_rate=88 spo2=97 ok
+2026-11-04 23:40 bed-05 heart_rate=131 ALARM nurse informed
+2026-11-05 00:10 bed-05 heart_rate=96 ok
+2026-11-05 01:30 bed-02 waveform viewer restarted
+2026-11-05 02:05 bed-07 spo2=89 ALARM oxygen increased
+2026-11-05 02:20 bed-07 spo2=95 ok
+2026-11-05 03:45 bed-04 upload of night recordings started
+2026-11-05 04:10 server warning: No space left on device
+2026-11-05 05:30 bed-06 heart_rate=72 ok

@@ -11,7 +11,7 @@ Public site: https://konakion.github.io/its4dh-practicals/
 | Practical 01 | OS fundamentals: the Linux terminal | ready |
 | Practical 02 | Processes & threads | ready |
 | Practical 03 | IPC & scheduling | ready |
-| Practical 04 | Memory & isolation | coming soon (placeholder) |
+| Practical 04 | Memory & file systems | ready |
 
 ## How it works
 
@@ -54,6 +54,17 @@ fix with `flock`, a real deadlock between two `syncjob`s, and the Linux schedule
 `renice`). Scheduling algorithms and the semaphore trace are calculated by hand (report steps). In the
 emulated Linux, CPU shares measured under different nice values are not reproducible, so the practical
 measures only equal shares and calculates the effect of nice from the kernel's weights.
+
+**Practical 04** runs completely in the browser Linux, which has 39 MB of RAM and no swap. Students
+read `free` and `/proc/meminfo`, look at the memory map of their own process (`/proc/self/maps`) and
+measure its stack in pages, split an address into page and offset with shell arithmetic, count real
+minor page faults with `/usr/bin/time -v` (dd with an 8 MB buffer: about 40 faults when it is only
+reserved, about 2090 when it is filled), read the resident size of the course program `cache`, cause
+a real out-of-memory kill and find it in `dmesg`, create hard and symbolic links, and solve a home
+file system that reports *No space left on device* because all 4170 inodes are used. Address
+translation and page replacement (FIFO with 3 and 4 frames, Belady's anomaly, LRU) are calculated
+by hand. Measured page faults vary by a few from run to run, so that step uses the check mode
+`numbers` (same numbers within `check.tol` of Linux's own measurement).
 
 **Practical 02 in Codespaces.** `python3 p02.py check TASK` (in `labs/practical-02`) runs the
 student's program, measures it, inspects the code with `ast` and prints specific feedback. On
@@ -117,7 +128,8 @@ GitHub Pages and only runs when started manually.
    `test_learning.cjs` and `test_course_browser.cjs` pick up every ready session from the registry
    automatically. Run all checks above and look at the screenshots.
 
-No engine or template changes are needed for a new session.
+No engine or template changes are needed for a new session. Check modes for shell steps: `lines`,
+`number`, `names`, `lineset`, `numbers` (measured values with a tolerance `tol`) or a `state` probe.
 
 ## Limitations
 

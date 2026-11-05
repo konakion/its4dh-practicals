@@ -1,0 +1,5 @@
+Night shift handover, ward 4B (synthetic data)
+bed-02: waveform viewer crashed twice, restarted at 01:30
+bed-05: tachycardia at 23:40, stable since 00:10
+bed-07: SpO2 dropped to 89 %, oxygen increased, now 95 %
+server: log could not be written at 04:10, IT informed

@@ -1,0 +1,14 @@
+#!/usr/bin/lua
+-- cache MB [SECONDS]
+-- Loads MB megabytes of synthetic ECG waveforms into memory, as the PulseBridge waveform
+-- viewer does, and keeps them there for SECONDS (default 600). Course program, Practical 04.
+local mb, secs = tonumber(arg[1] or ''), tonumber(arg[2] or '600')
+if not mb or mb < 1 or mb > 64 or mb % 1 ~= 0 or not secs then
+  io.stderr:write('usage: cache MB [SECONDS]   (MB: a whole number from 1 to 64)\n')
+  os.exit(2)
+end
+local waves = {}
+for i = 1, mb do waves[i] = string.rep(string.char(65 + i % 26), 1024 * 1024) end
+print(string.format('cache: %d MB of waveforms loaded', mb))
+io.stdout:flush()
+os.execute('sleep ' .. secs)

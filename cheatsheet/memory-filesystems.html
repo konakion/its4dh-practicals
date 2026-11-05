@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Memory & file systems cheat sheet</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --red: #b1063a; --ink: #24313f; --muted: #5d6874; --line: #d9dde1; --soft: #fbf1f4; --code: #f3f4f6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { width: 210mm; height: 297mm; font: 7.5pt/1.33 'DejaVu Sans', Verdana, sans-serif; color: var(--ink); position: relative; overflow: hidden; }
+  .bar { height: 3.2mm; background: var(--red); }
+  .page { padding: 7mm 13mm 0; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .course { font-weight: bold; font-size: 9.6pt; line-height: 1.4; color: #4a5561; margin-top: 2mm; }
+  .logo { width: 43mm; margin-top: 0.5mm; }
+  h1 { font-size: 22pt; line-height: 1.1; margin: 3mm 0 1.2mm; letter-spacing: -0.2pt; }
+  .sub { color: var(--muted); margin: 0 0 3mm; padding-bottom: 2.6mm; border-bottom: 0.6pt solid var(--line); }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 8mm; }
+  h2 { font-size: 10.2pt; margin: 2.2mm 0 1.4mm; padding-bottom: 1.3mm; border-bottom: 0.6pt solid var(--line); }
+  h2 .n { color: var(--red); margin-right: 1.6mm; }
+  h3 { font: bold 8.6pt 'DejaVu Sans Mono', Menlo, monospace; color: var(--red); margin: 1.6mm 0 0.3mm; }
+  p { margin: 0 0 0.6mm; }
+  code, pre, .mono { font-family: 'DejaVu Sans Mono', Menlo, monospace; font-size: 7.2pt; }
+  .cmd { margin: 0.2mm 0 0.5mm; white-space: pre; line-height: 1.38; }
+  .cmd .c { color: #7a8591; }
+  .note { font-size: 6.6pt; color: var(--muted); margin: 0.2mm 0 0.6mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 1.2mm; font-size: 7.1pt; }
+  th { text-align: left; font-weight: bold; color: var(--muted); font-size: 6.8pt; border-bottom: 0.6pt solid var(--line); padding: 0.6mm 1mm 0.8mm 0; }
+  td { padding: 0.8mm 1mm 0.8mm 0; border-bottom: 0.4pt solid #eceef0; vertical-align: top; }
+  td:first-child { font-weight: bold; white-space: nowrap; }
+  .box { background: var(--soft); border-radius: 1.6mm; padding: 2mm 2.8mm 2.2mm; margin: 1.6mm 0 0.5mm; }
+  .box h4 { margin: 0 0 0.8mm; color: var(--red); font-size: 8.2pt; }
+  .box p { color: #4a5561; font-size: 7.2pt; }
+  .formula { font-weight: bold; }
+  .gantt { margin: 0.8mm 0 0.4mm; }
+  .gantt .row { display: flex; align-items: center; margin: 0.5mm 0; }
+  .gantt .lab { width: 13mm; font-weight: bold; font-size: 6.8pt; }
+  .gantt .track { display: flex; width: 64mm; }
+  .gantt .s { height: 3.6mm; color: #fff; font: bold 6.2pt/3.6mm 'DejaVu Sans', sans-serif; text-align: center; border-right: 0.4mm solid #fff; }
+  .gantt .L { background: #2547a8; } .gantt .A { background: #b1063a; } .gantt .D { background: #17724b; } .gantt .B { background: #8f5100; }
+  .gantt .res { font-size: 6.6pt; color: var(--muted); margin-left: 2mm; white-space: nowrap; }
+  .axis { display: flex; width: 64mm; margin-left: 13mm; font-size: 5.8pt; color: var(--muted); justify-content: space-between; }
+  .pt { display: flex; gap: 0.6mm; margin: 0.8mm 0 0.6mm; }
+  .pt span { flex: 1; text-align: center; font: bold 6.4pt/3.8mm 'DejaVu Sans Mono', monospace; color: #fff; border-radius: 0.6mm; }
+  .pt .p { background: #2547a8; } .pt .o { background: #8f5100; } .pt .f { background: #17724b; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 7mm; display: flex; justify-content: space-between; font-size: 6.7pt; color: var(--muted); border-top: 0.6pt solid var(--line); padding-top: 1.6mm; }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<div class="page">
+  <header>
+    <div class="course">Introduction to IT Systems<br>for Digital Health Experts</div>
+    <img class="logo" src="hpi-logo.png" alt="Hasso Plattner Institut">
+  </header>
+  <h1>Memory &amp; file systems cheat sheet</h1>
+  <p class="sub">Practical 04 | Everything runs in the browser Linux; address translation and page replacement are worked out on paper.</p>
+
+  <div class="cols">
+    <div>
+      <h2><span class="n">01</span>How much memory?</h2>
+      <div class="cmd mono">free -m                      <span class="c">RAM and swap in MB</span>
+grep Swap /proc/meminfo      <span class="c">values from the kernel</span></div>
+      <p class="note">/proc is written by the kernel the moment you read it. Swap = disk space for pages when RAM is full (the pantry next to the counter). This server: 39 MB RAM, no swap.</p>
+
+      <h2><span class="n">02</span>Address spaces</h2>
+      <p>Every process sees its own virtual address space. One region per line: start-end (hex), rights, name.</p>
+      <div class="cmd mono">cat /proc/self/maps          <span class="c">your own map</span>
+cat /proc/1/maps             <span class="c">refused: root's process</span>
+echo $(( (0xbfbdd000 - 0xbfbbc000) / 4096 ))  <span class="c">33</span></div>
+      <p class="note">r = read, w = write, x = execute. Code is r-x, the stack rw-. Stack addresses change with every process (randomization), its size does not.</p>
+
+      <h2><span class="n">03</span>Pages and page faults</h2>
+      <div class="pt"><span class="p">page = address ÷ 4096</span><span class="o">offset = address mod 4096</span></div>
+      <div class="cmd mono">echo $(( 30000 / 4096 )) $(( 30000 % 4096 ))   <span class="c">7 1328</span></div>
+      <div class="pt"><span class="f">physical = frame × 4096 + offset</span></div>
+      <p class="note">Page table: page 7 → frame 2, so 30000 → 2 × 4096 + 1328 = 9520. The offset never changes.</p>
+      <div class="cmd mono">/usr/bin/time -v COMMAND 2&gt;&amp;1 | grep -E 'Minor|Page size'</div>
+      <table>
+        <tr><th>dd, 8 MB buffer</th><th>Minor page faults</th></tr>
+        <tr><td>count=0 (reserved)</td><td>≈ 40</td></tr>
+        <tr><td>count=1 (filled)</td><td>≈ 2090: + 2048 pages = 8 MB ÷ 4 kB</td></tr>
+      </table>
+      <p><span class="formula">Demand paging:</span> a page costs RAM only when it is touched for the first time.</p>
+
+      <h2><span class="n">04</span>When RAM runs out</h2>
+      <div class="cmd mono">ps -o pid,vsz,rss,comm       <span class="c">VSZ reserved, RSS in RAM (kB)</span>
+grep VmRSS /proc/PID/status  <span class="c">the same for one process</span>
+dmesg | grep 'Out of memory' <span class="c">the kernel's report</span></div>
+      <p class="note">No swap and RAM full: the OOM killer stops a process, usually the largest. The shell prints Killed, everything else keeps running.</p>
+    </div>
+
+    <div>
+      <h2><span class="n">05</span>Page replacement</h2>
+      <p>Requests 1 2 3 4 1 2 5 1 2 3 4 5, all frames empty at the start.</p>
+      <table>
+        <tr><th>Strategy</th><th>Evicts</th><th>misses, 3 frames</th><th>4 frames</th></tr>
+        <tr><td>FIFO</td><td>the page that came in first</td><td>9</td><td>10</td></tr>
+        <tr><td>LRU</td><td>the page unused for longest</td><td>10</td><td>8</td></tr>
+        <tr><td>OPT</td><td>the page needed latest (needs the future)</td><td>7</td><td>6</td></tr>
+      </table>
+      <div class="box">
+        <h4>Belady's anomaly (1969)</h4>
+        <p>With FIFO, more frames can cause <b>more</b> misses. LRU and OPT never get worse with more frames. Real systems approximate LRU (Clock: one reference bit per page).</p>
+      </div>
+
+      <h2><span class="n">06</span>Names, inodes and links</h2>
+      <p>An <b>inode</b> holds everything about a file except its name: owner, size, times, block addresses. A folder maps names to inode numbers.</p>
+      <div class="cmd mono">ls -i FOLDER          <span class="c">inode numbers</span>
+ln FILE NEWNAME       <span class="c">hard link: same inode</span>
+ln -s FILE NEWNAME    <span class="c">symbolic link: a path</span>
+ls -l                 <span class="c">2nd column: names</span></div>
+      <p class="note">rm removes a name. The data is freed when the last name is gone. A symbolic link breaks when its target name disappears.</p>
+
+      <h2><span class="n">07</span>Blocks and file systems</h2>
+      <div class="cmd mono">ls -l FILE            <span class="c">content size (bytes)</span>
+du -k FILE            <span class="c">space on disk (kB)</span>
+df -T                 <span class="c">file systems, types</span>
+mount | head -n 1     <span class="c">nr_inodes: max. files</span>
+ls FOLDER | wc -l     <span class="c">names in a folder</span></div>
+      <p class="note">2 bytes occupy one 4 kB block (internal fragmentation). tmpfs keeps files in RAM. Every file needs an inode: a file system can report No space left on device while bytes are free (on a normal Linux: df -i).</p>
+      <table>
+        <tr><th>Memory</th><th>File system</th></tr>
+        <tr><td>page / frame</td><td>block / sector</td></tr>
+        <tr><td>page table</td><td>inode (or FAT)</td></tr>
+        <tr><td>TLB</td><td>page cache</td></tr>
+        <tr><td>page fault</td><td>read from disk</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+<footer><span>ITS4DH &nbsp;/&nbsp; Memory &amp; file systems &nbsp;/&nbsp; Orhan Konak</span><span>konakion.github.io/its4dh-practicals &nbsp;&nbsp; 1 / 1</span></footer>
+</body>
+</html>

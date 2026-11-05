@@ -59,6 +59,11 @@ const res = o => Object.assign({ stdout: '', stderr: '', status: 0, cwd: '/home/
   assert(!compare.names('upload.log', 'upload.log upload_small.log'));
   assert(compare.lineset('     50 upload timeout\n     50 connection refused\n', '     50 connection refused\n     50 upload timeout\n'));
   assert.equal(numberOf('8 data/upload_small.log'), 8);
+  assert(compare.numbers('faults: 40\nfaults: 2088\n', 'faults: 39\nfaults: 2090\n', { tol: 10 }));
+  assert(compare.numbers('40 2088', 'faults: 39\nfaults: 2090\n', { tol: 10 }));
+  assert(!compare.numbers('faults: 40\nfaults: 2200\n', 'faults: 39\nfaults: 2090\n', { tol: 10 }));
+  assert(!compare.numbers('faults: 40\n', 'faults: 39\nfaults: 2090\n', { tol: 10 }));
+  assert(!compare.numbers('', ''));
 
   // output exercise: right, wrong, error explanations
   const grepC = step('search/grep-c');
@@ -341,5 +346,55 @@ if (READY.some(s => s.slug === 'practical-03')) {
   assert.match(sch.steps[1].solution, /average = 14 ÷ 4 = 3\.5 ms/);
   assert.match(sch.steps[2].solution, /L finishes at 16 ms/);
   console.log(`PASS 5 practical-03: ${answers} hand-calculated answers through the page's verify() (wrong answers explained), ${charts} charts drawn from the correct schedules`);
+}
+// ---------------------------------------------------------------- 6. Practical 04: answers worked out by hand
+if (READY.some(s => s.slug === 'practical-04')) {
+  const CASES = require('./cases/practical-04.cjs');
+  const window = load('practical-04');
+  const { parseResult, parseNumber } = window.ITS4DH;
+  const C = window.PRACTICAL;
+  const ctx = { saved: id => (CASES.saved || {})[id] || null, parse: parseResult, number: parseNumber };
+  let answers = 0, charts = 0;
+  for (const ch of C.chapters) for (const st of ch.steps) {
+    if (st.mode !== 'report') continue;
+    const id = `${ch.id}/${st.id}`, cases = CASES[id];
+    for (const [v, re] of cases.wrong) {
+      const r = st.verify(v, ctx);
+      assert(!r.ok, `${id}: wrong answer accepted: ${JSON.stringify(v)}`);
+      assert.match(r.msg, re, `${id}: feedback for ${JSON.stringify(v)}`);
+      answers++;
+    }
+    for (const v of cases.alts.concat([cases.model])) {
+      const r = st.verify(v, ctx);
+      assert(r.ok, `${id}: correct answer rejected: ${JSON.stringify(v)}: ${r.msg}`);
+      answers++;
+    }
+    if (st.chart) {
+      const spec = st.chart(st.verify(cases.model, ctx).save, ctx);
+      assert(spec && spec.bars.length >= 2 && spec.bars.every(b => b.value > 0), `${id}: chart`);
+      charts++;
+    }
+  }
+  // the page-replacement answers, recomputed independently of the page's own simulation
+  const refs = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5];
+  const misses = (lru, n) => {
+    let frames = [], m = 0;
+    for (const p of refs) {
+      if (frames.includes(p)) { if (lru) frames = frames.filter(x => x !== p).concat(p); continue; }
+      m++; if (frames.length === n) frames.shift(); frames.push(p);
+    }
+    return { m, end: frames.slice().sort().join() };
+  };
+  assert.deepEqual(misses(false, 3), { m: 9, end: '3,4,5' });
+  assert.equal(misses(false, 4).m, 10, 'Belady: FIFO with 4 frames');
+  assert.equal(misses(true, 4).m, 8, 'LRU with 4 frames');
+  const rep = C.chapters.find(c => c.id === 'replace');
+  assert.match(rep.steps[0].solution, /9 misses, pages 3 4 5/);
+  assert.match(rep.steps[1].solution, /10 misses/);
+  assert.match(rep.steps[2].solution, /8 misses/);
+  // address translation: 30000 = 7 × 4096 + 1328, page 7 → frame 2
+  assert.equal(2 * 4096 + (30000 % 4096), 9520);
+  assert.match(C.chapters.find(c => c.id === 'paging').steps[1].solution, /= 9520/);
+  console.log(`PASS 6 practical-04: ${answers} answers through the page's verify() (wrong answers explained), ${charts} charts; FIFO 9/10 misses (Belady) and LRU 8 misses recomputed`);
 }
 console.log('PASS: all learning tests');

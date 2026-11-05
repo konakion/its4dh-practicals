@@ -39,7 +39,7 @@ const ok = (msg) => { passed++; console.log('PASS', msg); };
   assert.equal(await page.locator('.session').count(), LAB.sessions.length);
   assert.equal(await page.locator('.session > a').count(), ready.length, 'only ready sessions are links');
   assert.equal(await page.locator('.session.soon').count(), LAB.sessions.length - ready.length);
-  assert.match(await page.locator('.session.soon').first().innerText(), /Coming soon/);
+  if (ready.length < LAB.sessions.length) assert.match(await page.locator('.session.soon').first().innerText(), /Coming soon/);
   assert.equal(await page.evaluate(() => window.practicalLinux), undefined, 'no Linux on the overview page');
   await page.screenshot({ path: path.join(OUT, 'lab-overview.png'), fullPage: true });
   ok(`overview lists ${LAB.sessions.length} sessions, ${ready.length} ready, the others marked coming soon`);

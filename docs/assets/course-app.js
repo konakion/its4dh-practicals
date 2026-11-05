@@ -72,6 +72,13 @@
     lines: (got, exp) => { const a = lines(got), b = lines(exp); return b.length > 0 && a.length === b.length && a.every((l, i) => l === b[i]); },
     number: (got, exp) => { const n = numberOf(got); return n !== null && n === Number(exp.trim()); },
     names: (got, exp) => { const have = new Set(got.split(/\s+/)); const want = exp.split(/\s+/).filter(Boolean); return want.length > 0 && want.every(w => have.has(w)); },
+    // measured values that change a little from run to run (page faults, sizes): the same
+    // numbers in the same order, each within check.tol of Linux's own measurement
+    numbers: (got, exp, c = {}) => {
+      const nums = t => (t.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+      const a = nums(got), b = nums(exp), tol = c.tol || 0;
+      return b.length > 0 && a.length === b.length && a.every((x, i) => Math.abs(x - b[i]) <= tol);
+    },
     lineset: (got, exp) => {
       const n = s => lines(s).map(l => l.trim().replace(/\s+/g, ' ')).filter(Boolean).sort().join('\n');
       return n(exp) !== '' && n(got) === n(exp);
@@ -117,7 +124,7 @@
       ok = code === 'OK';
       if (!ok) reason = step.reasons && step.reasons[code] ? fill(step.reasons[code]) : null;
     } else {
-      ok = r.status === 0 && compare[c.output](r.stdout, r.probe);
+      ok = r.status === 0 && compare[c.output](r.stdout, r.probe, c);
     }
     if (ok) {
       const unmet = (step.mustUse || []).find(u => !u.re.test(command));
@@ -770,7 +777,8 @@
   function drawChart(spec) {
     if (spec.type === 'gantt') return drawGantt(spec);
     const W = 640, left = 150, right = 70, barH = 20, gap = 10, top = 8;
-    const fmt = v => (Math.round(v * 100) / 100).toFixed(2) + ' ' + spec.unit;
+    const digits = spec.digits == null ? 2 : spec.digits;   // decimals of the value labels
+    const fmt = v => v.toFixed(digits) + ' ' + spec.unit;
     const fig = h('figure', { class: 'chart' }, h('figcaption', { text: spec.title }));
     let rows = [], max = 0;
     if (spec.type === 'bars') { rows = spec.bars.map(b => ({ label: b.label, start: 0, end: b.value, text: fmt(b.value) })); }
