@@ -1,7 +1,7 @@
 /*
  * Main-thread client for shell-worker.js. One LinuxSession = one real Linux VM.
  * Usage:
- *   const linux = new LinuxSession(files, onState, { prelude: 'PATH=...' });
+ *   const linux = new LinuxSession(files, onState, { prelude: 'PATH=...', boot: 'root setup' });
  *   await linux.ready;
  *   const r = await linux.exec('ls -l', 'optional probe');
  */
@@ -14,6 +14,7 @@
     constructor(files, onState = () => {}, options = {}) {
       this.files = files;
       this.prelude = options.prelude || '';
+      this.boot = options.boot || '';
       this.onState = onState;
       this.seq = 0;
       this.pending = new Map();
@@ -36,7 +37,7 @@
       };
       this.worker.onerror = event => this.fail('The Linux runtime stopped: ' + (event.message || 'unknown error'));
       this.ready = this.loadFiles()
-        .then(files => this.call({ type: 'boot', files }, 120000))
+        .then(files => this.call({ type: 'boot', files, script: this.boot }, 120000))
         .then(() => { this.state = 'ready'; this.onState('ready'); })
         .catch(error => { this.fail(error.message); throw error; });
       this.ready.catch(() => {});

@@ -5,7 +5,9 @@
  * with BusyBox. Nothing here interprets shell commands in JavaScript: every
  * command is written to a file and executed by /bin/sh inside the guest.
  *
- * Isolation: no network adapter, no host directory mount. The guest's 9p share
+ * Isolation: no connection to any network, no host directory mount. The emulated
+ * network card (eth0) has no relay behind it, so nothing it sends leaves the page.
+ * The guest's 9p share
  * (/mnt) is an in-memory browser filesystem used only to pass the command in and
  * stdout/stderr out. Commands run as the unprivileged user "student".
  *
@@ -44,7 +46,7 @@ const read = async name => {
   return text.endsWith('x') ? text.slice(0, -1) : text; // sentinel byte, see below
 };
 
-async function boot(files) {
+async function boot(files, script) {
   vm = new V86({
     wasm_path: new URL('linux/v86.wasm', self.location).href,
     bios: { url: new URL('linux/seabios.bin', self.location).href },
@@ -79,6 +81,13 @@ async function boot(files) {
     const mode = file.readOnly ? (file.exec ? 555 : 444) : (file.exec ? 755 : 644);
     await send(`mkdir -p '${dir}'; cp /mnt/${tmp} '${target}'; rm -f /mnt/${tmp}; ` +
       `chown ${owner} '${dir}' '${target}'; chmod ${mode} '${target}'; chmod 755 '${dir}'`);
+  }
+  // An optional script of the practical, run once as root before the snapshot, for
+  // example to give the network card an address or to start a small DNS server.
+  // Daemons it starts are part of the snapshot, so Reset brings them back as well.
+  if (script) {
+    await vm.create_file('boot.sh', enc(script + '\n'));
+    if (!await send('. /mnt/boot.sh >/dev/null 2>&1; rm -f /mnt/boot.sh', 60000)) throw Error('Linux setup of this practical failed.');
   }
   await send(`cd ${HOME}`);
   await vm.stop();
@@ -134,7 +143,7 @@ let queue = Promise.resolve();
 self.onmessage = ({ data }) => {
   queue = queue.then(async () => {
     try {
-      if (data.type === 'boot') { await boot(data.files); self.postMessage({ id: data.id, type: 'ready' }); }
+      if (data.type === 'boot') { await boot(data.files, data.script); self.postMessage({ id: data.id, type: 'ready' }); }
       else if (data.type === 'exec') self.postMessage({ id: data.id, type: 'result', ...(await exec(data.command, data.probe, data.prelude)) });
       else if (data.type === 'reset') { await reset(); self.postMessage({ id: data.id, type: 'ready' }); }
     } catch (error) {

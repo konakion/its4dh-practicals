@@ -12,6 +12,7 @@ Public site: https://konakion.github.io/its4dh-practicals/
 | Practical 02 | Processes & threads | ready |
 | Practical 03 | IPC & scheduling | ready |
 | Practical 04 | Memory & file systems | ready |
+| Practical 05 | Networks & the Internet | ready |
 
 ## How it works
 
@@ -39,7 +40,8 @@ attempts, and feedback that explains the result.
   `check.state`) runs in the same Linux and the page compares results, never the typed text.
   A practical can define a `prelude` that is sourced before every command (Practical 02: course
   programs on the `PATH`, job control on).
-- *report*: work outside the page, for example in the Codespaces terminal. The student pastes the
+- *report*: work outside the page, for example in the Codespaces terminal (`where: 'codespace'`)
+  or on the student's own laptop (`where: 'laptop'`, `commands` as one list per operating system). The student pastes the
   output of a checker or enters their own numbers; `verify(values, ctx)` judges it. Values saved by
   one step (`save`) are available to later steps (`ctx.saved('chapter/step')`) and to `chart()`.
 - *interleave*: a deterministic "you are the scheduler" exercise with two threads, a shared counter
@@ -65,6 +67,19 @@ file system that reports *No space left on device* because all 4170 inodes are u
 translation and page replacement (FIFO with 3 and 4 frames, Belady's anomaly, LRU) are calculated
 by hand. Measured page faults vary by a few from run to run, so that step uses the check mode
 `numbers` (same numbers within `check.tol` of Linux's own measurement).
+
+**Practical 05** runs in the browser Linux and on the student's own laptop. The practical's `boot`
+script (run once as root before the snapshot) turns the browser Linux into a laptop on Ward 3: the
+emulated network card `eth0` gets 192.168.1.10/24 with the default gateway 192.168.1.1, and four
+BusyBox `dnsd` servers on the loopback play the ward's resolver (127.0.0.1) and a small DNS
+hierarchy (root 127.0.0.2 → .org 127.0.0.3 → example.org 127.0.0.4; each answers with the address
+of the next server to ask, which the text says). The card has no relay behind it: packets really
+leave `eth0`, and nothing comes back. Students read `ip addr`, `ip route` and `ip route get`, ping,
+watch packets with the course program `capture` (tcpdump in the background, one line per packet,
+the command stopped after 3 s), look up names with `nslookup`, walk the hierarchy server by server,
+and find and remove a wrong line in `/etc/hosts`. Their own laptop (`ipconfig` and friends), private
+or public addresses, direct delivery or gateway, the number of packets for a file, forwarding with
+six routing tables (also after a line failure) and a NAT table are report steps.
 
 **Practical 02 in Codespaces.** `python3 p02.py check TASK` (in `labs/practical-02`) runs the
 student's program, measures it, inspects the code with `ast` and prints specific feedback. On
@@ -119,12 +134,15 @@ GitHub Pages and only runs when started manually.
 2. **Files for the browser Linux** (if any): put the originals into `data/practical-03/`, byte
    copies into `docs/assets/fixtures/p03/`, list them in `files` (`readOnly`, `exec` as needed) and
    add the pairs to `scripts/check.py`.
-3. **Page and registry.** Create `docs/practical-03.md` (copy `practical-02.md`, change the front
+3. **Root setup** (optional): a `boot` string in `window.PRACTICAL` runs once as root after the
+   course files are copied and before the snapshot, for example to configure the network card or
+   start a small server. Daemons it starts survive Reset, because they are part of the snapshot.
+4. **Page and registry.** Create `docs/practical-03.md` (copy `practical-02.md`, change the front
    matter to `practical: practical-03`), add it to `nav` in `mkdocs.yml`, and set the entry in
    `docs/assets/practicals.js` to `status: 'ready'`.
-4. **Codespaces work** (optional): add `labs/practical-03/` with its own checker, modelled on
+5. **Codespaces work** (optional): add `labs/practical-03/` with its own checker, modelled on
    `labs/practical-02/p02.py` (same `signature()`), starter files and a `scripts/test_lab_03.py`.
-5. **Tests.** Add `scripts/cases/practical-03.cjs` with wrong and correct attempts for every step.
+6. **Tests.** Add `scripts/cases/practical-03.cjs` with wrong and correct attempts for every step.
    `test_learning.cjs` and `test_course_browser.cjs` pick up every ready session from the registry
    automatically. Run all checks above and look at the screenshots.
 
@@ -137,6 +155,9 @@ No engine or template changes are needed for a new session. Check modes for shel
   Interactive programs (`less`, `nano`, `vi`, live `top`) cannot be used in the page; Practical 02
   uses a Codespace for them. Each Run in the page is a new shell, so `jobs` and `fg` only see jobs
   started in the same Run.
+- The browser Linux has no connection to any network. Practical 05 simulates a ward network inside
+  it; real Internet paths (traceroute, public DNS) are explained, measured on the student's own
+  laptop, or worked out by hand.
 - Codespaces need a GitHub account; the free monthly quota of personal accounts is enough for a
   practical, but students should stop their Codespace afterwards.
 - Measured times in Practical 02 depend on the machine. The checker accepts ranges, not fixed values;

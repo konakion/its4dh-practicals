@@ -20,5 +20,7 @@ window.ITS4DH_LAB = {
       subtitle: 'Let processes talk through pipes and sockets, cause and fix a race and a deadlock, and be the scheduler.', pillar: 'Pillar 1: Operating systems', minutes: 90, status: 'ready' },
     { id: 'its4dh-p04', slug: 'practical-04', number: 'Practical 04', title: 'Memory & file systems', navTitle: 'Memory & file systems',
       subtitle: 'Look inside the address space of a process, watch pages load on demand, cause an out-of-memory kill, and solve a full disk that still has free space.', pillar: 'Pillar 1: Operating systems', minutes: 90, status: 'ready' },
+    { id: 'its4dh-p05', slug: 'practical-05', number: 'Practical 05', title: 'Networks & the Internet', navTitle: 'Networks & the Internet',
+      subtitle: 'Find the address and the way out of a ward laptop, watch real packets leave it, route a packet by hand, and walk the DNS hierarchy yourself.', pillar: 'Pillar 2: Internet & WWW', minutes: 90, status: 'ready' },
   ],
 };

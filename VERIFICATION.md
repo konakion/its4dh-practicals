@@ -1,4 +1,41 @@
-# Verification, 5 November 2026
+# Verification, 18 November 2026
+
+Extension of the lab with Practical 05 (Networks & the Internet), matching Lecture 5 (Pillar II,
+week 1): 6 chapters, 22 exercises (13 in the browser Linux, 9 on paper or on the student's own
+laptop), 6 quizzes, cheat sheet (`cheatsheet/networks-internet.html` and PDF). Practicals 01 to 04
+are unchanged.
+
+Engine changes, all optional and backwards compatible:
+- `boot` in `window.PRACTICAL`: a script run once as root in the browser Linux after the course
+  files are copied and before the snapshot (`shell-worker.js`, `linux-session.js`, `course-app.js`).
+- Report steps with `where: 'laptop'` get the tag *Your own laptop*; `commands` may be one list per
+  operating system (`{ Windows: [...], macOS: [...], Linux: [...] }`), shown as one box each.
+
+## Practical 05, automated results
+
+| Check | Result |
+|---|---|
+| `python3 scripts/check.py` | PASS: `capture` byte-identical in `data/practical-05` and `docs/assets/fixtures/p05`; five ready sessions |
+| `node scripts/test_learning.cjs` (as a normal user) | PASS, all sections: structure of 5 sessions; Practical 05: 6 chapters, 22 exercises, Learn texts within 25 to 85 words, 55 answers through the page's `verify()` with the expected feedback; private ranges recomputed with prefix masks, direct/gateway decisions, 3,425 packets, both routing paths and the path after the R2–R5 failure recomputed independently |
+| `mkdocs build --strict`, `scripts/check_site.py` | PASS: 7 pages, 47 local links and assets under `/its4dh-practicals/` |
+| `ONLY=practical-05 node scripts/test_course_browser.cjs` | ALL PASS, 35 checks: 14 example outputs reproduced in the browser Linux; 13 shell exercises with 34 wrong, 23 alternative and all model solutions; 9 report steps with 47 wrong and 17 correct answers; 6 quizzes; progress, completion page, 390/768 px layout, keyboard, Restart Linux |
+| Full browser test, all five sessions | ALL PASS, 167 checks (Practicals 01 to 04 unchanged by the engine changes) |
+| Mutation check | A wrong next hop in `practical-05.js` fails test_learning |
+
+Measured in the browser Linux while designing (Linux 6.8, BusyBox 1.36.1): the kernel has no dummy
+or veth interfaces, but the emulated card `eth0` exists and can be configured as root; with a static
+ARP entry for the gateway, pings to other networks leave `eth0` as real IP packets (seen by
+tcpdump), pings to absent neighbours end with *host unreachable*. `ip route get` gives *via
+192.168.1.1* for 192.168.2.20 and 192.0.2.80 and a direct route for 192.168.1.20 and 192.168.1.254.
+`dnsd` answers A records (AAAA with NotImp, which nslookup shows as *No answer*); `nslookup NAME
+SERVER` asks any of the four servers; ping and the browser honour `/etc/hosts`, nslookup does not.
+Students can ping (via `net.ipv4.ping_group_range`) and run tcpdump (setuid inside the VM only).
+tcpdump in the emulator needs up to a second before it captures, so `capture` waits for its
+*listening* message and for its output to stop growing. BusyBox `ip route show default` does not
+filter (the test uses `ip route | head -n 1` instead); `traceroute` cannot work without a network
+behind `eth0`, so traceroute is read on paper and run on the student's own laptop.
+
+# Previous verification, 5 November 2026
 
 Extension of the lab with Practical 04 (Memory & file systems), matching Lecture 4: 8 chapters,
 21 exercises (16 in the browser Linux, 5 calculated by hand), 8 quizzes, cheat sheet

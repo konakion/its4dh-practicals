@@ -285,7 +285,7 @@
   const linux = needsLinux ? new window.LinuxSession(C.files, (state, message) => {
     if (state !== 'running') { linuxState = state; linuxMessage = message || ''; }
     linuxListeners.forEach(fn => fn(state, message));
-  }, { prelude: C.prelude }) : null;
+  }, { prelude: C.prelude, boot: C.boot }) : null;
   window.practicalLinux = linux;
   const statusText = s => ({
     booting: 'Starting Linux…', ready: 'Linux ready', running: 'Running…', failed: 'Linux could not start',
@@ -334,7 +334,8 @@
     linuxBadge.querySelector('.linux-badge-text').textContent = statusText(state);
   });
 
-  const placeTag = st => (st.mode === 'report' && st.where === 'codespace' ? 'Codespaces' : null);
+  const PLACES = { codespace: 'Codespaces', laptop: 'Your own laptop' };
+  const placeTag = st => (st.mode === 'report' && PLACES[st.where]) || null;
   function renderNav(route) {
     nav.textContent = '';
     const list = h('ol', { class: 'chapter-list' });
@@ -709,7 +710,10 @@
     art.append(h('section', { class: 'turn', 'aria-labelledby': 'turn-h' },
       h('h2', { id: 'turn-h', class: 'section-title', text: 'Your turn' }),
       h('p', { class: 'task', id: 'task-text' }, rich(step.task)),
-      step.commands ? commandBox(step.where === 'codespace' ? 'In your Codespaces terminal' : 'Commands', step.commands, step.where === 'codespace' && C.codespace ? C.codespace : null) : null,
+      // commands: a list, or one list per operating system ({ Windows: [...], macOS: [...] })
+      ...(!step.commands ? [] : Array.isArray(step.commands)
+        ? [commandBox(step.where === 'codespace' ? 'In your Codespaces terminal' : step.where === 'laptop' ? 'In a terminal on your own laptop' : 'Commands', step.commands, step.where === 'codespace' && C.codespace ? C.codespace : null)]
+        : Object.entries(step.commands).map(([os, cmds]) => commandBox(os, cmds))),
       form, feedback, hintBox, chartBox));
     clearButton.addEventListener('click', () => { form.reset(); feedback.textContent = ''; feedback.className = 'feedback'; });
     form.addEventListener('submit', e => {

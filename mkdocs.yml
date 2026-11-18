@@ -19,4 +19,5 @@ nav:
   - "Practical 02: Processes & threads": practical-02.md
   - "Practical 03: IPC & scheduling": practical-03.md
   - "Practical 04: Memory & file systems": practical-04.md
+  - "Practical 05: Networks & the Internet": practical-05.md
   - About: about.md

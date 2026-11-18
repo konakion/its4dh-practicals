@@ -397,4 +397,48 @@ if (READY.some(s => s.slug === 'practical-04')) {
   assert.match(C.chapters.find(c => c.id === 'paging').steps[1].solution, /= 9520/);
   console.log(`PASS 6 practical-04: ${answers} answers through the page's verify() (wrong answers explained), ${charts} charts; FIFO 9/10 misses (Belady) and LRU 8 misses recomputed`);
 }
+// ---------------------------------------------------------------- 7. Practical 05: answers worked out by hand
+if (READY.some(s => s.slug === 'practical-05')) {
+  const CASES = require('./cases/practical-05.cjs');
+  const window = load('practical-05');
+  const { parseResult, parseNumber } = window.ITS4DH;
+  const C = window.PRACTICAL;
+  const ctx = { saved: id => (CASES.saved || {})[id] || null, parse: parseResult, number: parseNumber };
+  let answers = 0;
+  for (const ch of C.chapters) for (const st of ch.steps) {
+    if (st.mode !== 'report') continue;
+    const id = `${ch.id}/${st.id}`, cases = CASES[id];
+    for (const [v, re] of cases.wrong) {
+      const r = st.verify(v, ctx);
+      assert(!r.ok, `${id}: wrong answer accepted: ${JSON.stringify(v)}`);
+      assert.match(r.msg, re, `${id}: feedback for ${JSON.stringify(v)}`);
+      answers++;
+    }
+    for (const v of cases.alts.concat([cases.model])) {
+      const r = st.verify(v, ctx);
+      assert(r.ok, `${id}: correct answer rejected: ${JSON.stringify(v)}: ${r.msg}`);
+      answers++;
+    }
+  }
+  // private ranges, recomputed with prefix masks instead of the page's own comparison
+  const n32 = a => a.split('.').reduce((x, o) => x * 256 + Number(o), 0);
+  const inNet = (a, net, bits) => Math.floor(n32(a) / 2 ** (32 - bits)) === Math.floor(n32(net) / 2 ** (32 - bits));
+  const priv = a => inNet(a, '10.0.0.0', 8) || inNet(a, '172.16.0.0', 12) || inNet(a, '192.168.0.0', 16);
+  const all = ['10.20.3.44', '172.20.1.5', '172.40.1.5', '192.168.178.42', '192.0.2.80', '8.8.8.8'];
+  assert.deepEqual(all.filter(priv), CASES['local/private'].model.priv);
+  // direct or gateway from 192.168.1.10/24
+  const dec = CASES['local/decide'].model;
+  for (const [k, addr] of Object.entries({ printer: '192.168.1.20', pc: '192.168.1.37', portal: '192.0.2.80', ward4: '192.168.2.20', edge: '192.168.1.254' }))
+    assert.equal(dec[k], inNet(addr, '192.168.1.10', 24) ? 'direct' : 'gateway', `decide ${addr}`);
+  // packets: 5,000,000 bytes with 1,460 bytes per packet
+  assert.equal(Math.ceil(5000000 / 1460), 3425);
+  assert(C.chapters.find(c => c.id === 'packets').steps.find(s => s.id === 'count').solution.includes('3,425'));
+  // routing: follow the tables independently, before and after the failure of R2–R5
+  const T = { R1: ['R2', 'R3'], R2: ['R5', 'R4'], R3: ['R4', 'R6'], R4: ['R5', 'R6'], R5: [null, 'R4'], R6: ['R4', null] };
+  const follow = (col, t = T) => { const p = ['R1']; while (t[p[p.length - 1]][col]) p.push(t[p[p.length - 1]][col]); return p.join(' '); };
+  assert.equal(follow(0), CASES['routing/forward'].model.portal);
+  assert.equal(follow(1), CASES['routing/forward'].model.uni);
+  assert.equal(follow(0, Object.assign({}, T, { R2: ['R4', 'R4'] })), CASES['routing/broken'].model.path);
+  console.log(`PASS 7 practical-05: ${answers} answers through the page's verify() (wrong answers explained); private ranges, direct/gateway, packet count and both routing paths recomputed`);
+}
 console.log('PASS: all learning tests');

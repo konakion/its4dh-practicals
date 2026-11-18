@@ -1,0 +1,52 @@
+#!/bin/sh
+# capture COMMAND ...   Course program of ITS4DH Practical 05.
+# Runs COMMAND and prints every IPv4 packet that leaves or reaches this laptop
+# meanwhile, one line per packet. It runs tcpdump in the background and shortens
+# its output; `tcpdump -n -v -i any` shows the full details. COMMAND is stopped
+# after 3 seconds.
+if [ $# -eq 0 ]; then
+  echo 'usage: capture COMMAND ...    for example: capture ping -c 1 192.0.2.80' >&2
+  exit 2
+fi
+out=/tmp/capture.$$
+tcpdump -l -n -t -v -i any -c 20 ip >"$out" 2>"$out.log" &
+pid=$!
+# wait until tcpdump is listening (at most 8 seconds), so that no packet is missed
+i=0
+while ! grep -q listening "$out.log" 2>/dev/null && [ $i -lt 80 ]; do sleep 0.1; i=$((i+1)); done
+sleep 0.3
+# run the command, but stop it after 3 seconds: a ping without an answer would wait much longer
+"$@" >/dev/null 2>&1 &
+cmd=$!
+( sleep 3; kill "$cmd" 2>/dev/null ) &
+guard=$!
+wait "$cmd" 2>/dev/null
+kill "$guard" 2>/dev/null
+# give tcpdump time to print what it saw: wait until its output stops growing (at most 3 seconds)
+n=0; last=-1
+while [ $n -lt 15 ]; do
+  size=$(wc -c < "$out")
+  [ "$size" -gt 0 ] && [ "$size" = "$last" ] && break
+  last=$size; sleep 0.2; n=$((n+1))
+done
+kill "$pid" 2>/dev/null
+wait "$pid" 2>/dev/null
+awk '
+  /^[a-z]/ { card = $1; dir = tolower($2); ttl = ""; if (match($0, /ttl [0-9]+/)) ttl = substr($0, RSTART + 4, RLENGTH - 4); want = 1; next }
+  want && /^    [0-9]/ {
+    want = 0
+    split($0, part, ": "); split(part[1], ends, " > ")
+    src = ends[1]; dst = ends[2]; gsub(/ /, "", src)
+    what = substr($0, index($0, ": ") + 2)
+    if (what ~ /AAAA|NotImp/) next
+    if (what ~ /^[0-9]+\+? A\? /) { sub(/^[0-9]+\+? A\? /, "", what); sub(/\. \([0-9]+\)$/, "", what); what = "DNS question: A? " what }
+    else if (what ~ /^[0-9]+[*-]* [0-9]+\/[0-9]+\/[0-9]+ /) { sub(/^[0-9]+[*-]* [0-9]+\/[0-9]+\/[0-9]+ /, "", what); sub(/ \([0-9]+\)$/, "", what); sub(/\. A /, " A ", what); what = "DNS answer: " what }
+    else if (what ~ /NXDomain/) what = "DNS answer: no such name"
+    sub(/, id [0-9]+/, "", what); sub(/, length [0-9]+$/, "", what)
+    if (src ~ /\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/) sub(/\.[0-9]+$/, ":&", src)
+    if (dst ~ /\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/) sub(/\.[0-9]+$/, ":&", dst)
+    sub(/:\./, ":", src); sub(/:\./, ":", dst)
+    printf "%-4s %-3s  %s > %s  ttl=%s  %s\n", card, dir, src, dst, ttl, what
+  }' "$out"
+rm -f "$out" "$out.log"
+exit 0

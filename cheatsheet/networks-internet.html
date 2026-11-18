@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Networks &amp; the Internet cheat sheet</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --red: #b1063a; --ink: #24313f; --muted: #5d6874; --line: #d9dde1; --soft: #fbf1f4; --code: #f3f4f6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { width: 210mm; height: 297mm; font: 7.5pt/1.33 'DejaVu Sans', Verdana, sans-serif; color: var(--ink); position: relative; overflow: hidden; }
+  .bar { height: 3.2mm; background: var(--red); }
+  .page { padding: 7mm 13mm 0; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .course { font-weight: bold; font-size: 9.6pt; line-height: 1.4; color: #4a5561; margin-top: 2mm; }
+  .logo { width: 43mm; margin-top: 0.5mm; }
+  h1 { font-size: 22pt; line-height: 1.1; margin: 3mm 0 1.2mm; letter-spacing: -0.2pt; }
+  .sub { color: var(--muted); margin: 0 0 3mm; padding-bottom: 2.6mm; border-bottom: 0.6pt solid var(--line); }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 8mm; }
+  h2 { font-size: 10.2pt; margin: 2.2mm 0 1.4mm; padding-bottom: 1.3mm; border-bottom: 0.6pt solid var(--line); }
+  h2 .n { color: var(--red); margin-right: 1.6mm; }
+  h3 { font: bold 8.6pt 'DejaVu Sans Mono', Menlo, monospace; color: var(--red); margin: 1.6mm 0 0.3mm; }
+  p { margin: 0 0 0.6mm; }
+  code, pre, .mono { font-family: 'DejaVu Sans Mono', Menlo, monospace; font-size: 7.2pt; }
+  .cmd { margin: 0.2mm 0 0.5mm; white-space: pre; line-height: 1.38; }
+  .cmd .c { color: #7a8591; }
+  .note { font-size: 6.6pt; color: var(--muted); margin: 0.2mm 0 0.6mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 1.2mm; font-size: 7.1pt; }
+  th { text-align: left; font-weight: bold; color: var(--muted); font-size: 6.8pt; border-bottom: 0.6pt solid var(--line); padding: 0.6mm 1mm 0.8mm 0; }
+  td { padding: 0.8mm 1mm 0.8mm 0; border-bottom: 0.4pt solid #eceef0; vertical-align: top; }
+  td:first-child { font-weight: bold; white-space: nowrap; }
+  .box { background: var(--soft); border-radius: 1.6mm; padding: 2mm 2.8mm 2.2mm; margin: 1.6mm 0 0.5mm; }
+  .box h4 { margin: 0 0 0.8mm; color: var(--red); font-size: 8.2pt; }
+  .box p { color: #4a5561; font-size: 7.2pt; }
+  .formula { font-weight: bold; }
+  .gantt { margin: 0.8mm 0 0.4mm; }
+  .gantt .row { display: flex; align-items: center; margin: 0.5mm 0; }
+  .gantt .lab { width: 13mm; font-weight: bold; font-size: 6.8pt; }
+  .gantt .track { display: flex; width: 64mm; }
+  .gantt .s { height: 3.6mm; color: #fff; font: bold 6.2pt/3.6mm 'DejaVu Sans', sans-serif; text-align: center; border-right: 0.4mm solid #fff; }
+  .gantt .L { background: #2547a8; } .gantt .A { background: #b1063a; } .gantt .D { background: #17724b; } .gantt .B { background: #8f5100; }
+  .gantt .res { font-size: 6.6pt; color: var(--muted); margin-left: 2mm; white-space: nowrap; }
+  .axis { display: flex; width: 64mm; margin-left: 13mm; font-size: 5.8pt; color: var(--muted); justify-content: space-between; }
+  .pt { display: flex; gap: 0.6mm; margin: 0.8mm 0 0.6mm; }
+  .pt span { flex: 1; text-align: center; font: bold 6.4pt/3.8mm 'DejaVu Sans Mono', monospace; color: #fff; border-radius: 0.6mm; }
+  .pt .p { background: #2547a8; } .pt .o { background: #8f5100; } .pt .f { background: #17724b; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 7mm; display: flex; justify-content: space-between; font-size: 6.7pt; color: var(--muted); border-top: 0.6pt solid var(--line); padding-top: 1.6mm; }
+  .pt .g { background: #8f5100; }
+  .os td:first-child { font-weight: bold; }
+  .os td { font-family: 'DejaVu Sans Mono', Menlo, monospace; font-size: 6.2pt; white-space: nowrap; }
+  .os td:first-child, .os th { font-family: 'DejaVu Sans', Verdana, sans-serif; }
+  .walk { display: flex; align-items: stretch; gap: 0.8mm; margin: 1mm 0 0.8mm; }
+  .walk div { flex: 1; border-radius: 0.8mm; background: var(--code); padding: 0.9mm 1.2mm; font-size: 6.5pt; line-height: 1.3; }
+  .walk div b { display: block; color: var(--red); font-size: 6.8pt; }
+  .walk .arr { flex: 0 0 auto; background: none; padding: 0.9mm 0; color: var(--muted); align-self: center; }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<div class="page">
+  <header>
+    <div class="course">Introduction to IT Systems<br>for Digital Health Experts</div>
+    <img class="logo" src="hpi-logo.png" alt="Hasso Plattner Institut">
+  </header>
+  <h1>Networks &amp; the Internet cheat sheet</h1>
+  <p class="sub">Practical 05 | The browser Linux is a laptop on Ward 3 of a practice network (192.168.1.10/24); your own laptop answers the same questions with the commands in the table. Routing, NAT and the DNS walk are worked out on paper.</p>
+
+  <div class="cols">
+    <div>
+      <h2><span class="n">01</span>Your address and your way out</h2>
+      <table class="os">
+        <tr><th>Question</th><th>Linux</th><th>macOS</th><th>Windows</th></tr>
+        <tr><td>IP address</td><td>ip addr</td><td>ipconfig getifaddr en0</td><td>ipconfig</td></tr>
+        <tr><td>gateway</td><td>ip route</td><td>route -n get default</td><td>ipconfig</td></tr>
+        <tr><td>name → IP</td><td>nslookup NAME</td><td>nslookup NAME</td><td>nslookup NAME</td></tr>
+        <tr><td>answers?</td><td>ping -c 4 HOST</td><td>ping -c 4 HOST</td><td>ping HOST</td></tr>
+        <tr><td>route</td><td>traceroute HOST</td><td>traceroute HOST</td><td>tracert HOST</td></tr>
+      </table>
+      <div class="cmd mono">ip addr show eth0 | grep inet  <span class="c">inet 192.168.1.10/24</span>
+ip route | grep default        <span class="c">default via 192.168.1.1</span>
+ip route get 192.168.2.20      <span class="c">via 192.168.1.1: gateway</span></div>
+      <p class="note">lo / 127.0.0.1 = loopback, the computer talking to itself. inet = IPv4 address. /24 = the first 24 bits (three numbers) name the network; same as the subnet mask 255.255.255.0. DHCP hands out address, mask, gateway and DNS server for a limited time (lease).</p>
+
+      <h2><span class="n">02</span>Private or public</h2>
+      <table>
+        <tr><th>Range</th><th>Meaning</th></tr>
+        <tr><td>10.0.0.0 – 10.255.255.255</td><td>private (large networks, hospitals)</td></tr>
+        <tr><td>172.16.0.0 – 172.31.255.255</td><td>private (172.40.x.x is public!)</td></tr>
+        <tr><td>192.168.0.0 – 192.168.255.255</td><td>private (home routers)</td></tr>
+        <tr><td>everything else</td><td>public: unique on the whole Internet</td></tr>
+      </table>
+      <p class="note">Private addresses are reused in every network; NAT replaces them on the way out (06). Special: 127.x.x.x loopback, 169.254.x.x self-assigned (no DHCP answer).</p>
+
+      <h2><span class="n">03</span>Direct or via the gateway?</h2>
+      <div class="pt"><span class="p">same network part → directly</span><span class="g">different → default gateway</span></div>
+      <p class="note">From 192.168.1.10/24: 192.168.1.20 (printer) → directly; 192.168.2.20 (Ward 4) → gateway: private, but another network; 192.0.2.80 (portal) → gateway. The gateway itself always has your network part.</p>
+
+      <h2><span class="n">04</span>Packets</h2>
+      <div class="cmd mono">ping -c 2 192.168.1.10          <span class="c">2 received, 0% loss</span>
+capture ping -c 1 192.0.2.80    <span class="c">course program (tcpdump)</span>
+<span class="c">eth0 out  192.168.1.10 &gt; 192.0.2.80  ttl=64  ICMP …</span>
+ping -c 1 -t 3 HOST             <span class="c">start with TTL 3</span></div>
+      <p><b>Header:</b> source (where the reply goes), destination (read by every router), TTL. The content is never read by routers.</p>
+      <div class="pt"><span class="f">packets = ⌈ size ÷ 1,460 bytes ⌉</span></div>
+      <p class="note">≈ 1,500 bytes per packet, ≈ 40 of them headers. X-ray 5,000,000 bytes → 3,424.7 → 3,425 packets. 300 bytes → 1 packet. Always round up.</p>
+      <div class="box">
+        <h4>“The portal does not open on this laptop”</h4>
+        <p><b>1</b> Address? <span class="mono">ip addr</span>: 169.254 → no DHCP. <b>2</b> Way out? <span class="mono">ip route</span>, ping the gateway. <b>3</b> Name? <span class="mono">nslookup</span> vs. ping, and /etc/hosts. Works by address but not by name → step 3.</p>
+      </div>
+    </div>
+
+    <div>
+      <h2><span class="n">05</span>Routing: one hop at a time</h2>
+      <p>Each router looks up the <b>destination network</b> and hands the packet to the <b>next hop</b>. No router knows the whole path.</p>
+      <div class="cmd mono">       to 192.0.2.0/24    to 198.51.100.0/24
+R1  →  R2                 R3
+R2  →  R5                 R4
+R3  →  R4                 R6
+R4  →  R5                 R6
+R5  →  directly           R4
+R6  →  R4                 directly</div>
+      <p class="note">Hospital → portal: R1 R2 R5. → university: R1 R3 R6. Line R2–R5 fails, R2 now says R4: R1 R2 R4 R5. Routers update their own tables (routing protocols); IP is best effort: packets can be lost, delayed or reordered.</p>
+      <div class="box">
+        <h4>TTL: two meanings</h4>
+        <p><b>IP packet:</b> a hop counter, lowered by one per router; at 0 the packet is dropped and an error goes back (traceroute uses this). 64 − 9 routers = 55. <b>DNS record:</b> how many seconds an answer may stay in a cache.</p>
+      </div>
+
+      <h2><span class="n">06</span>NAT at the hospital router</h2>
+      <div class="cmd mono">inside (private)       outside (public)
+192.168.1.10:51000  ↔  203.0.113.5:40001
+192.168.1.37:52200  ↔  203.0.113.5:40002</div>
+      <p class="note">Out: private source → 203.0.113.5 and a free port, noted in the table. In: the port decides the device (40002 → nurses' PC). No entry (40999) → dropped: devices behind NAT cannot be called from outside. Not a firewall.</p>
+
+      <h2><span class="n">07</span>DNS: names to numbers</h2>
+      <div class="cmd mono">cat /etc/resolv.conf           <span class="c">nameserver = the resolver</span>
+nslookup pacs.example.org      <span class="c">ask the resolver</span>
+nslookup org 127.0.0.2         <span class="c">ask one server</span></div>
+      <div class="walk"><div><b>root</b>knows the server of every ending (.org, .de)</div><span class="arr">→</span><div><b>TLD .org</b>knows the server of every domain in .org</div><span class="arr">→</span><div><b>authoritative</b>holds the records: portal.example.org = 192.0.2.80</div></div>
+      <p class="note">The recursive resolver walks root → TLD → authoritative for you and caches every answer for its TTL. “No answer” at the end of nslookup only means: no IPv6 address. NXDOMAIN: no such name.</p>
+      <div class="box">
+        <h4>/etc/hosts is checked first</h4>
+        <p>A line there wins over DNS (nslookup ignores it, ping and browsers do not). Opens by address but not by name → look at name resolution: DNS or /etc/hosts. Remove a line: <span class="mono">grep -v portal /etc/hosts &gt; /tmp/h; cat /tmp/h &gt; /etc/hosts</span></p>
+      </div>
+      <table>
+        <tr><th>Table</th><th>translates</th><th>lives in</th></tr>
+        <tr><td>NAT table</td><td>public port → private address</td><td>your router</td></tr>
+        <tr><td>routing table</td><td>destination network → next hop</td><td>every router</td></tr>
+        <tr><td>DNS</td><td>name → IP address</td><td>servers worldwide</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+<footer><span>ITS4DH &nbsp;/&nbsp; Networks &amp; the Internet &nbsp;/&nbsp; Orhan Konak</span><span>konakion.github.io/its4dh-practicals &nbsp;&nbsp; 1 / 1</span></footer>
+</body>
+</html>
