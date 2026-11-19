@@ -19,7 +19,9 @@ jobs:
 
   # Runs every example, exercise and quiz against the real browser Linux.
   browser:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.56 has no browser build for newer Ubuntu releases
+    # (ubuntu-latest moved to 26.04). Raise both together when upgrading Playwright.
+    runs-on: ubuntu-24.04
     needs: check
     steps:
       - uses: actions/checkout@v4
